@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="beanshell">
+
+  <var-def name="result">
+    <datastore name="ds_test">
+        select * from @this;
+    </datastore>
+  </var-def>
+     
+  <script><![CDATA[
+      System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" + result.toString());
+  ]]></script>  	
+  
+  
+  <var-def name="outputLink">
+    <s3 bucket="vr1677">
+        <s3-put path="aharhots/my_super_file.csv" acl="PublicRead" content-type="text/csv; charset=utf-8" content-disposition="inline">
+            <list-to-csv>
+                <json expression="$.row">
+                    <xml-to-json>
+                        <datastore name="ds_test">
+                            select * from @this;
+                        </datastore>
+                    </xml-to-json>
+                </json>
+            </list-to-csv>
+        </s3-put>
+    </s3>
+ </var-def>
+  
+  <export include-original-data="true">
+	<single-column name="result" value="${result.toString()}"/>
+	<single-column name="outputLink" value="${outputLink}"/>
+  </export>
+
+</config>

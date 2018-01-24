@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+
+	<robotics-flow>
+		<robot driver="universal" close-on-completion="true"
+			start-in-private="false">
+			<capability name="SEARCH_ALL_WINDOWS" value="true" />
+			<script><![CDATA[
+				def s3Path = "https://pub_demo.s3.amazonaws.com/trainings/Tickers.xlsx"
+				def s3Path2 = "https://pub_demo.s3.amazonaws.com/trainings/other-excel.xlsx"
+				def sourceFile = downloadFileOnAgent(s3Path)
+				def destinationFile = downloadFileOnAgent(s3Path2)
+				def newFilePath = System.getProperty("java.io.tmpdir") + "copied-excel.xlsx"
+				sys.defineVariable("path", newFilePath)
+				
+				// opening the 1st excel file
+				
+				openExcel(sourceFile)
+				switchSheet(sourceFile, "Fact")
+								
+				// Copying a range
+				
+				def tempRange = getRange(sourceFile, 'A1')
+				
+				// opening another excel file and pasting the range from the 1st one
+				
+				openExcel(destinationFile)
+				setRange(destinationFile, 'A2', tempRange)
+				
+				// Saving the 2nd excel as new file and closing all files
+				
+				saveExcel(destinationFile, newFilePath)
+				closeExcel(destinationFile)
+				closeExcel(sourceFile)
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false">
+		<single-column name="path" value="${path}"></single-column>
+	</export>
+</config>

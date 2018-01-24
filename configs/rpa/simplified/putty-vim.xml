@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot driver="desktop" name="aDriver" close-on-completion="true">
+			<capability name="SEARCH_ALL_WINDOWS">true</capability>
+			<script><![CDATA[
+				open("C:\\Program Files\\PuTTY\\putty.exe -ssh traning@traning-ssh.workfusion.com -pw dEFgEmzL")
+				sleep(15 * 1000)
+
+				switchTo().window("[CLASS:PuTTY]")
+				sleep(2000)
+
+				sendKeys('vim the-new-file.txt{ENTER}')
+				sleep(1000)
+
+				// copy all console content into variable
+				windowContent = copyPuttyWindowText()
+				sleep(1000)
+
+				// delete row command
+				sendKeys('aaaaaaa')
+				sendKeys('{TAB}{ENTER 2}')
+				sendKeys('{UP}{UP}{DOWN}{DOWN}')
+				
+				// switch to edit mode
+				sendKeys('i');
+				sleep(1000);
+				
+				// edit text file
+				sendKeys('{UP}{DOWN}{RIGHT}{RIGHT}{TAB}{TAB}')
+				sendKeys('Hello, Robot{!}')
+				sendKeys('{CTRLDOWN}c{CTRLUP}')
+				sendKeys(':q{!}')
+				sendKeys('{ENTER}')
+				sleep(1000)
+				sendKeys('{CTRLDOWN}d{CTRLUP}')
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false">
+		<single-column name="putty_text" value="${windowContent}" />
+	</export>
+</config>

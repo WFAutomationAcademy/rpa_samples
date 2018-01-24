@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ make ping and save result WO autoit driver -->
+	<script><![CDATA[
+		// {{ import library
+		import java.util.concurrent.TimeUnit;
+		import java.io.BufferedReader;
+		import java.io.InputStreamReader;
+		// }} import library
+		// def command var
+		def command		= "ping -n 3 google.com";
+		// def result var
+		def pingResult	= "";
+		
+		try {
+			// get RUNTIME 
+		    runtime = Runtime.getRuntime().exec(command);
+		    runtime.waitFor();
+		    // get reader from runtime
+		    reader	= new BufferedReader(new InputStreamReader(runtime.getInputStream()));
+		    // def temp string for read
+		    def line= "";          
+			while ((line = reader.readLine())!= null) {
+				// add read result to result string if it not null
+				pingResult += (line + "\n");
+		    }
+		} catch (Exception e) {
+			// set error message to result string if we have exception
+			pingResult = e.getMessage();
+		}	        	
+		// show result	     	
+		println pingResult;
+		// set result to sys var
+		sys.defineVariable("ping_wo_autoit", pingResult);
+		// wait for view
+		TimeUnit.SECONDS.sleep(10);
+	]]></script>
+	<!-- }} make ping and save result WO autoit driver -->
+
+	<!-- {{ make ping and save result with autoit driver -->
+    <selenium-flow>
+        <selenium browser="autoit" name="autoitDriver" close-on-completion="true">
+	        <script><![CDATA[
+	        	// import library
+	        	import java.util.concurrent.TimeUnit;
+	        	// get autoit driver
+                aDriver = autoitDriver.getWrappedObject();       
+                aDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
+                // execute groovy script in autoit and return results
+				pingResult = aDriver.executeScript(
+				"import java.io.BufferedReader;\n"+
+				"import java.io.InputStreamReader;\n"+
+				"\n"+
+				"def command		= \"ping -n 3 google.com\";\n"+
+				"def pingResult	= \"\";\n"+
+				"\n"+
+				"try {\n"+
+				"    runtime = Runtime.getRuntime().exec(command);\n"+
+				"    runtime.waitFor();\n"+
+				"    reader	= new BufferedReader(new InputStreamReader(runtime.getInputStream()));\n"+
+				"    def line= \"\";\n"+          
+				"while ((line = reader.readLine())!= null) {\n"+
+				"	pingResult += (line + \"\\n\");\n"+
+				"    }\n"+
+				"} catch (Exception e) {\n"+
+				"	pingResult = e.getMessage();\n"+
+				"}\n"+
+				"return pingResult", "GROOVY").toString();
+				// show result		
+				println pingResult;
+				// set result to sys var
+				sys.defineVariable("ping_with_autoit", pingResult);
+				// wait for view
+				TimeUnit.SECONDS.sleep(10);
+	         ]]></script>
+        </selenium>
+    </selenium-flow>
+​	<!-- }} make ping and save result with autoit driver -->
+	<!-- Export values to the output CSV file -->
+    <export include-original-data="false">
+		<single-column name="ping_wo_autoit"	value="${ping_wo_autoit.toString()}"/>
+		<single-column name="ping_with_autoit"	value="${ping_with_autoit.toString()}"/>
+    </export>
+</config>

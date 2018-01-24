@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+    <robotics-flow>
+        <robot name="driver" driver="desktop" close-on-completion="true">
+            <capability name="imageSimilarityThreshold " value="0.2"/>
+            <script><![CDATA[
+                String imagePath = "https://rpa-grid.s3.amazonaws.com/integration-test/images-win-10/calculator";
+
+                open("calc.exe");
+                setOption("typeOnScreen", true);
+
+				//actual coordinates and image depand on screen resolution and window size
+                $(byImage("${imagePath}/calculator2.png", -10, 25)).click(); // 2
+                $(byImage("${imagePath}/calculator2.png",  175, -75)).click(); // *
+                $(byImage("${imagePath}/calculator2.png", -10, -30)).click(); // 5
+                $(byImage("${imagePath}/calculator2.png",  230, 75)).click(); // =
+                $(byImage("${imagePath}/menu.png")).click(); // show menu
+
+                // copy result
+                sys.defineVariable("calculationResult", selectAllTextAndCopy());
+
+                // close
+                pressAltF4();
+            ]]></script>
+        </robot>
+    </robotics-flow>
+
+    <export include-original-data="false">
+    	<single-column name="result" value="${calculationResult}"/>
+    </export>
+
+</config>

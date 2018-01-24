@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- {{
+For this example need file with input data.
+
+File format *.csv
+
+file_name - name for current table
+path - path to save current table
+sheetCount - sheet count
+rowCount - row count for 1 sheet
+cellCount - cell count for 1 sheet
+ -->
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<script>
+		<![CDATA[
+			// {{ import library for work with Excel
+			import org.apache.poi.ss.usermodel.Cell;
+			import org.apache.poi.ss.usermodel.Row;
+			import org.apache.poi.ss.usermodel.Sheet;
+			import org.apache.poi.ss.usermodel.Workbook;
+			import org.apache.poi.ss.util.CellReference;
+			import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+			// }} import library for work with Excel
+			
+			// {{ formatting import parametrs
+			sheetCnt= Integer.parseInt(sheetCount.toString());
+			rowCnt	= Integer.parseInt(rowCount.toString());
+	   		cellCnt	= Integer.parseInt(cellCount.toString());
+	   		fullPath= path.toString()+file_name.toString()+".xlsx";
+	   		// }} formatting import parametrs
+	   		
+	   		// create Excel doc
+	        xlsTable = new SXSSFWorkbook(); 
+	        // create sheets in Excel doc
+	        (1..sheetCnt).each {
+		        sheet	 = xlsTable.createSheet();
+		        // create rows in sheet
+		        (0..rowCnt).each { rowNum -> 
+		        	row = sheet.createRow(rowNum);
+		        	// create cell in row
+		        	(0..cellCnt).each { cellNum ->
+		        		cell = row.createCell(cellNum);
+		        		cell.setCellValue(new CellReference(cell).formatAsString());
+		        	}
+		        }
+	        }
+	        // save Excel doc
+	        out = new FileOutputStream(new File(fullPath));
+	        xlsTable.write(out);
+	        out.close();
+			// close object for work with Excel
+	        xlsTable.dispose();   
+	     ]]>
+	</script>
+	<!-- save file path to the Excel doc -->
+	<export include-original-data="false">
+	       <single-column name="filePath" value="${fullPath}"/>
+	</export>
+</config>

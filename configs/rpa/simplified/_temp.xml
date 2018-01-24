@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+	<robotics-flow>
+		<robot name="robotDriver" driver="desktop"
+			close-on-completion="true" start-in-private="true">
+			<script><![CDATA[
+				
+				timeouts(15000)
+				open('notepad.exe')
+				window('Untitled - Notepad')
+				sendKeys('sometext')
+				
+				sendKeys(Keys.ENTER, Keys.ENTER)
+				sendKeys('sometext')
+				sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME))
+				
+				/* keyboard().pressKey(Keys.CONTROL)
+				keyboard().pressKey('a')
+				keyboard().releaseKey('a')
+				keyboard().releaseKey(Keys.CONTROL) */
+				
+				keyboard().pressKey(Keys.SHIFT)
+				sendKeys(Keys.DOWN, Keys.DOWN)
+				keyboard().releaseKey(Keys.SHIFT)
+				
+				
+				sleep(2000)
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false" />
+</config>

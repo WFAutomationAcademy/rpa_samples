@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<var-def name="console_script">
+		import java.io.BufferedReader
+        import java.io.InputStreamReader
+        String command = "ping -n 3 google.com"
+        StringBuffer output = new StringBuffer()
+        Process p
+        try {
+            p = Runtime.getRuntime().exec(command)
+            p.waitFor()
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))
+            String line = ""       
+            while ((line = reader.readLine())!= null) {
+                output.append(line + "\n")
+            }
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+        return output;
+	</var-def>
+	
+    <robotics-flow>
+        <robot driver="desktop" name="aDriver" close-on-completion="true">
+            <script><![CDATA[
+            	def scriptResult = executeGroovyScript(console_script.toString())
+                println("   ping output:\n" + scriptResult)
+                sys.defineVariable("ping_output", scriptResult.trim())
+             ]]></script>
+        </robot>
+    </robotics-flow>
+ 
+    <export include-original-data="false">
+        <single-column name="ping_output" value="${ping_output}"/>
+    </export>
+     
+</config>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<var-def name="message">
+      dummy
+    </var-def>
+    
+    <var-def name="result_data">
+        <datastore name="Company_DATA">
+            <template>select * from @this </template>
+        </datastore>
+    </var-def> 
+    
+    <script><![CDATA[		
+		 sys.defineVariable("message_groovy", message.toString(),true);
+		 
+		 intVal = 5;
+		 someVar = "text";
+		 def anotherVar = "ddddd";
+		 anotherVar = "another value";
+		 print anotherVar;
+	]]></script>
+			
+    <export include-original-data="true">
+    	<single-column name="message" value="${message}"/>
+    	<single-column name="message_groovy" value="${message_groovy}"/>
+    	<single-column name="result_data" value="${result_data}"/>
+    </export>
+
+</config>

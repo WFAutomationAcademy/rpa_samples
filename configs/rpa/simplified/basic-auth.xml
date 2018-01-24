@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+    <robotics-flow>
+        <robot name="webDriver" driver="internet explorer" close-on-completion="false" start-in-private="true">
+            <script><![CDATA[
+            	timeouts(40 * 1000)
+        		open('http://browserspy.dk/password.php')
+        		$(By.linkText("password-ok.php")).click()
+        		// if previous command doesn't work, replace it with following.
+        		// IE has issue with clicking on elements, see https://github.com/SeleniumHQ/selenium/issues/4292
+               	//elem = $(By.linkText("password-ok.php"))
+               	//driver().executeScript("arguments[0].click();", elem);
+            ]]></script>
+        </robot>
+         
+        <robot name="desktopDriver" driver="desktop" close-on-completion="true">
+        	<capability name="SEARCH_ALL_WINDOWS" value="true" />
+            <script><![CDATA[
+                window("[TITLE:Windows Security]")
+                sendKeys('test')
+                pressTab()
+                sendKeys('test')
+                pressEnter()
+            ]]></script>
+        </robot>
+         
+        <robot name="webDriver" driver="internet explorer" close-on-completion="true">
+            <script><![CDATA[
+                status = $(byXpath("//*[@id='right']/div/h1")).getText();
+            ]]></script>
+        </robot>
+    </robotics-flow>
+
+    <export include-original-data="false">   
+        <single-column name="status" value="${status.toString()}"/>
+    </export>
+</config>

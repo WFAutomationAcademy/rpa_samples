@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ set path for save file -->
+	<var-def name="pathToSave">
+		output/output.xlsx
+	</var-def>
+	<!-- }} set path for save file -->
+	<!-- {{ generate JSON for sample convertation -->
+   	<script><![CDATA[
+		import com.google.gson.Gson;
+
+		resultList = [];
+
+		nestedMap = [:];
+		
+		nestedMap["one"]	= "1";
+		nestedMap["two"]	= "2";
+		nestedMap["three"]	= "3";	
+
+		anotherNestedMap = [:];
+		anotherNestedMap["one"]		= "uno";
+		anotherNestedMap["two"]		= "dos";
+		anotherNestedMap["three"]	= "tres";	
+		anotherNestedMap["four"]	= "quatr";	
+
+		resultList << nestedMap;
+		
+		resultList << anotherNestedMap;
+
+		gson		= new Gson(); 
+		gsonData	= gson.toJson(resultList); 
+		
+		println "########\n"+gsonData+"\n########";
+		
+		// make JSON data available for work later
+		binding["convertedJSON"] = gsonData;
+  	]]></script>
+    <!-- }} generate JSON for sample convertation -->
+    
+    <!-- {{ convert JSON data to Excel and save it to file -->
+	<file action="write" path="${pathToSave}"  type="binary">
+	    <list-to-excel format="xlsx">
+			<template>${convertedJSON}</template>
+    	</list-to-excel>
+	</file>
+	<!-- }} convert JSON data to Excel and save it to file -->
+	<!-- export path to the saving Excel file -->
+    <export include-original-data="true">
+    	<single-column name="pathToSave" value="${pathToSave}"/>
+    </export>
+</config>

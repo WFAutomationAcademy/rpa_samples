@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+	<var-def name="sikuliScreenshotAllScreen"><![CDATA[
+		import org.sikuli.script.*;
+		Screen screen = new Screen();
+		return screen.capture(screen.getBounds()).getFile();
+	]]></var-def>
+
+	<robotics-flow>
+		<robot driver="desktop">
+			<script><![CDATA[
+				open("notepad.exe");
+				switchTo().window("[CLASS:Notepad]");
+				String imagePath = executeGroovyScript(sikuliScreenshotAllScreen.toString());
+				log.warn("file image : "+imagePath);
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="true"></export>
+</config>

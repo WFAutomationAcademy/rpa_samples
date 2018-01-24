@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot driver="chrome" name="web" close-on-completion="true">
+			<script><![CDATA[
+				
+				open("https://rpa-tutorial.s3.amazonaws.com/trainings/dnd/samples/dhtmlxTree/02_checkboxes/05_tree_checkboxes.html")
+				sleep(2000)
+				
+				driver().executeAsyncScript("window.setTimeout(function() {" + 
+					"var btn = document.createElement('BUTTON');" +
+					"btn.textContent = 'New Async Button';" +
+					"document.querySelector('h1').appendChild(btn);" +
+				"}, 2000);")
+				
+				$('#treeboxbox_tree table table tr:nth-child(1) > td > span').click()
+				$('body > table > tbody > tr:nth-child(1) > td:nth-child(2) > a:nth-child(9)').click()
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false"/>
+</config>

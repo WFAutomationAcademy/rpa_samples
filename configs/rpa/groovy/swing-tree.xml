@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+    <selenium-flow>
+       <!-- Internet explorer driver -->
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="false" start-in-private="true">
+            <script><![CDATA[
+            	import java.util.concurrent.TimeUnit;
+            	// {{ get web driver
+                ieDriver = seleniumDriver.getWrappedObject();
+                ieDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES).pageLoadTimeout(1, TimeUnit.MINUTES);
+                // }} get web driver
+                // get page with applet
+                ieDriver.get("https://citi-poc.s3.amazonaws.com/demo-applets/demo/jfc/SwingSet2/custom/SwingSet2.html");
+                // wait applet loading
+                TimeUnit.SECONDS.sleep(15);
+            ]]></script>
+        </selenium>
+		<!-- AutoIt driver -->
+        <selenium name="autoitDriver" browser="autoit" close-on-completion="false">
+            <script><![CDATA[
+            	import java.util.concurrent.TimeUnit;
+            	// {{ get autoit driver
+                aDriver = autoitDriver.getWrappedObject();
+                aDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
+                // }} get autoit driver
+                // map TimeUnit.SECONDS
+                tus = TimeUnit.SECONDS;
+                // switch to the applet window
+                aDriver.switchTo().window("[CLASS:SunAwtFrame]");
+                tus.sleep(1);
+               	// click "JTree demo" button in the applet window menu
+	            aDriver.findElement(By.cssSelector("[CLASS: JToggleButton; TOOLTIP:JTree demo]")).click();
+	            tus.sleep(1);
+	            // {{ save width and height JTree on the applet
+	            println "WIDTH - "+aDriver.findElement(By.cssSelector("[CLASS:JTree]")).getAttribute("getWidth").toString();
+	            println "HEIGHT - "+aDriver.findElement(By.cssSelector("[CLASS:JTree]")).getAttribute("getHeight").toString();
+	            tus.sleep(5);
+				// }} save width and height JTree on the applet
+				// open of a branch with name "Rock" and select it 
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; TEXT:Rock; LEVEL:1]")).sendKeys("{RIGHT}");
+	            tus.sleep(1);
+	            // open of a branch with name "Komeda" and select it  in the "Rock" branch
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; TEXT:Komeda]")).sendKeys("{RIGHT}");
+	            tus.sleep(1);
+	             // open of a branch with name "Genius Of"  and select it on level 3 hierarchy in the "Komeda" branch
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; TEXT:Genius Of; LEVEL:3]")).sendKeys("{RIGHT}");
+	            tus.sleep(1);
+				// select "More Is More" element in the "Genius Of" branch
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; TEXT:More Is More; LEVEL:4]")).sendKeys("{RIGHT}");
+	            tus.sleep(1);
+	            // open of a branch with name "Quartets" and select it by path in the in a chain ("Music|Classical|Beethoven") branches
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; PATH: Music|Classical|Beethoven|Quartets]")).sendKeys("{RIGHT}");
+	            tus.sleep(1);
+	            // select "Six String Quartets" element by path in the in a chain ("Music|Classical|Beethoven|Quartets") branches
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; PATH: Music|Classical|Beethoven|Quartets|Six String Quartets]")).sendKeys("{RIGHT}");
+	            tus.sleep(1);
+	            // open of a branch in a chain by mask "Music|Clas.*cal|Br.*ms|Conc.*tos"
+	            aDriver.findElement(By.cssSelector("[CLASS:JTree; PATH: Music|Clas.*cal|Br.*ms|Conc.*tos]")).sendKeys("{RIGHT}");
+	            tus.sleep(2);
+	            // close window
+	            aDriver.close();
+            ]]></script>
+        </selenium>
+		<!--  close all windows -->
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="true">
+        </selenium>
+    </selenium-flow>
+	<!-- Export values to the output CSV file -->
+    <export include-original-data="false"/>
+</config>

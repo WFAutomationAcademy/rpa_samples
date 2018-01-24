@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+	<var-def name="client_name">Abbble Inc.</var-def>
+	<var-def name="invoice_date">10/02/2016</var-def>
+	<var-def name="products_and_prices">{"products_and_prices":[{"product":"Wooden Table","quantity":"2","price":"140"},{"product":"Printer Ink","quantity":"1","price":"30"},{"product":"Paper Rim","quantity":"3","price":"60"}]}</var-def>
+	​
+	<robotics-flow>
+		<robot name="roboticsDriver" driver="chrome" close-on-completion="true" start-in-private="true">
+			<script><![CDATA[
+								
+				timeouts(40 * 1000);
+				Map rpaVariables = new HashMap();
+				
+				open("https://invoiceplane.workfusion.com");
+				
+				$("#login").click();
+				$("#email").val("wf-robot@mail.com");
+				$("#password").val("freedom4ROBOTS");
+				$(byName("btn_login")).click();
+				
+				$(byXpath("//*[contains(text(),'Invoices')]")).click();								
+				$(byLinkText("Create Invoice")).click();
+				$(byClassName("select2-selection--single")).click();
+
+				try {
+					$(byXpath("//*[contains(text(), '" + client_name.toString() + "')]")).click();
+				} catch(e) {
+					$(byXpath("//*[@id='select2-client_name-results']/li[2]")).click();
+				}
+			
+				$("#invoice_date_created").val(invoice_date.toString());
+				$("#invoice_group_id").sendKeys(Keys.DOWN, Keys.ENTER);
+				$("#invoice_create_confirm").click();
+				
+				Map items = new com.google.gson.Gson().fromJson(products_and_prices.toString(), Map.class);
+				List itemsList = items.get("products_and_prices");
+				invoice_number = $("#invoice_number").getAttribute("value");
+
+				for (int i = 0; i < itemsList.size(); i++) {
+					Map item = itemsList.get(i);
+					$(byXpath("//*[@id='item_table']/tbody[last()]/tr//input[@name='item_name']")).sendKeys(item.get("product"));
+					$(byXpath("//*[@id='item_table']/tbody[last()]/tr//input[@name='item_quantity']")).sendKeys(item.get("quantity"));
+					$(byXpath("//*[@id='item_table']/tbody[last()]/tr//input[@name='item_price']")).sendKeys(item.get("price"));
+					$(byXpath("//*[@id='item_table']/tbody[last()]/tr//input[@name='item_discount_amount']")).sendKeys("0");
+
+					if (i < itemsList.size() - 1) {
+						$(".btn_add_row").click();
+					}
+				}
+				
+				$("#btn_save_invoice").click();
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+
+	<export include-original-data="true">
+		<single-column name="invoice_number" value="${invoice_number}"/>
+	</export>
+
+</config>

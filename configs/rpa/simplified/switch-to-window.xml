@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot driver="chrome" name="web" close-on-completion="true">
+			<script><![CDATA[
+				import java.util.concurrent.TimeUnit
+				timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+
+				// Launch the URL
+				open('https://rpa-tutorial.s3.amazonaws.com/trainings/new-window.html')
+				sleep(2000)
+
+				// Store and Print the name of the First window on the console
+				String handle= driver().getWindowHandle()
+				println("========================== ${handle}")
+
+				// Click on the Button
+				$(byText('New Browser Tab')).click()
+				sleep(2000)
+				
+
+				// Store and Print the name of all the windows open
+				Set handles = driver().getWindowHandles()
+				println("@@@@@@@@@@@@@@@@@@@@@@@@@@@ ${handles}")
+
+				// Pass a window handle to the other window
+				for (String handle1 : driver().getWindowHandles()) {
+					println("%%%%%%%%%%%%%%%%%%%%%%%%%%%% ${handle1}")
+					switchTo().window(handle1)
+					sleep(2000)
+				}
+
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false" />
+</config>

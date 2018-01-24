@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" charset="UTF-8" scriptlang="groovy">
+	<!-- {{ set year for scraping -->
+	<var-def name="scrapYear">
+		<template>2013</template>
+	</var-def>
+	<!-- }} set year for scraping -->
+	<!-- {{ get data from web for scrap year -->
+	<var-def name="holidaysData">
+		<xpath expression="//body/div[@class='wrapper']/div[@class='main-content-div']/article/section[@class='article']/div[@class='tb-scroll']/table">
+			<html-to-xml prunetags="script,style,head,meta">
+				<http url="http://www.timeanddate.com/holidays/us/${scrapYear.toString()}" charset="UTF-8"></http>
+			</html-to-xml>
+		</xpath>
+	</var-def>
+	<!-- }} get data from web for scrap year -->
+	<!-- {{ fields name list from holidays table -->
+	<var-def name="fieldsList">
+		<xpath expression="//table/thead/tr[1]/*/text()">
+			<var name="holidaysData"/>
+		</xpath>	
+	</var-def>
+	<!-- }} fields name list from holidays table -->
+	<!-- {{ loop by rows and get data -->	
+	<script><![CDATA[          
+		recordsToExport = [];
+		sys.defineVariable("recordsToExport", recordsToExport, true);  
+	]]></script>
+	<loop item="row" index="idxr" maxloops="4">
+		<!-- {{ get row list -->
+		<list>
+			<xpath expression="//table/tbody/tr">
+				<var name="holidaysData"/>
+			</xpath>
+		</list>
+		<!-- {{ get row list -->
+		<body>
+			<!-- {{ print row number -->
+			<script><![CDATA[ 
+				map = [:]
+				println "ROW # "+idxr+" ====================================================================";
+ 			]]></script>
+ 			<!-- {{ loop by column and get data -->
+			<loop item="field" index="idxf">
+				<list>
+					<var name="fieldsList"/>
+				</list>
+				<body>
+					<!-- {{ get count nodes in column -->
+					<var-def name="countData">
+						<xpath expression="//tr/*[${idxf}]/count(*)">
+							<var name="row"/>
+						</xpath>
+					</var-def>
+					<!-- {{ get count nodes in column -->
+					<case>
+						<!-- {{ if node count = 0 then tag have only text data, get it -->
+						<if condition="${countData.toString().equals('0')}">
+							<var-def name="data">
+								<xpath expression="//tr/*[${idxf}]/text()">
+									<var name="row"/>
+								</xpath>
+							</var-def>
+						</if>
+						<!-- }} if node count = 0 then tag have only text data, get it -->
+						<!-- {{ if node count = 1 then tag have only 1 inner tag with text, get it -->
+						<if condition="${countData.toString().equals('1')}">
+							<var-def name="data">
+								<xpath expression="//tr/*[${idxf}]/*/text()">
+									<var name="row"/>
+								</xpath>
+							</var-def>
+						</if>
+						<!-- }} if node count = 1 then tag have only 1 inner tag with text, get it -->
+						<!-- {{ if node count > 1 then tag have some inner tag with text, get it in 1 string -->
+						<else>
+							<!-- {{ get inner nodes list -->
+							<var-def name="data">
+								<xpath expression="//tr/*[${idxf}]/*/text()">
+									<var name="row"/>
+								</xpath>
+							</var-def>
+							<!-- }} get inner nodes list -->
+							<!-- {{ set all data in 1 string -->
+							<script return="strData"><![CDATA[
+								def strData = ""; 
+								data.getWrappedObject().each {
+									strData+= strData.length()==0 ? it.toString() : ", "+it.toString();
+								}
+								// return string to sys variables
+								sys.defineVariable("strData", strData);
+				 			]]></script>
+				 			<!-- }} set all data in 1 string -->
+				 			<!-- {{ get data from string -->
+				 			<var-def name="data">
+				 				<template>${strData}</template>
+				 			</var-def>
+				 			<!-- {{ get data from string -->	
+						</else>
+						<!-- }} if node count > 1 then tag have some inner tag with text, get it in 1 string -->
+					</case>
+					<!-- {{ show scraping info to the monitor -->
+					<!-- here you can make special object and save inform for next export -->
+					<script><![CDATA[ 
+						println "FIELD: "+field+" / VALUE: "+data;
+						map [field.toString()] = data 
+ 		 			]]></script>
+ 		 			<!-- }} show scraping info to the monitor -->
+				</body>
+			</loop>
+			<script><![CDATA[
+				recordsToExport.getWrappedObject() << map; 
+ 			]]></script>
+			<!-- }} loop by column and get data -->
+		</body>
+	</loop>
+	<!-- }} loop by rows and get data -->
+	
+	<export include-original-data="true">
+    	<multi-column list="${recordsToExport.getWrappedObject()}" split-results="true">
+    		<loop item="columnName">
+                <list>
+                    <var name="fieldsList"/>
+                </list>
+                <body>
+                    <put-to-column-getter name="${columnName}" property="${columnName}" />
+                </body>
+            </loop>
+        </multi-column>
+	</export>
+</config>

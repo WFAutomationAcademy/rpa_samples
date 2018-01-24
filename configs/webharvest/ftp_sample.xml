@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ connect to the FTP remote dir "pub" and work with him -->
+ 	<ftp server="ftp.stat.duke.edu" username="anonymous" password="anonymous" remotedir="/pub">
+ 		<!-- {{ get FTP directory list -->
+		<var-def name="dirs"> 
+			<ftp-list listdirs="true" listfiles="false" listlinks="false"></ftp-list>
+		</var-def>
+		<!-- }} get directory list from root FTP directory  -->
+		<!-- {{ get file list from root FTP directory -->
+		<var-def name="files"> 
+			<ftp-list listdirs="false" listfiles="true" listlinks="false"></ftp-list>
+		</var-def>
+		<!-- {{ get link list from root FTP directory -->
+		<var-def name="links"> 
+			<ftp-list listdirs="false" listfiles="false" listlinks="true"></ftp-list>
+		</var-def>
+		<!-- }} get link list from root FTP directory -->
+		<!-- {{ show got information on the monitor -->
+		<script><![CDATA[ 
+			// import timeUnit library for setup timeouts
+           	import java.util.concurrent.TimeUnit;
+			// show info to the console
+			println "Root directory list - "+dirs.toList();
+			println "Root file list - "+files.toList();
+			println "Root links list - "+links.toList();
+			// small waiting for view
+			TimeUnit.SECONDS.sleep(1);
+		]]></script>
+		<!-- }} show got information on the monitor -->
+		<!-- {{ check if we have folders in root directory 
+				try get subfolders and files for 1st directory in list-->
+		<case>
+			<if condition="${dirs.toList().size()>0}">
+				<!-- sub folders list -->
+				<var-def name="subdirs"> 
+					<ftp-list path="${dirs.toList().get(0).toString()}" listdirs="true" listfiles="false" listlinks="false"></ftp-list>
+				</var-def>
+				<!-- sub files list -->
+				<var-def name="subfiles"> 
+					<ftp-list path="${dirs.toList().get(0).toString()}" listdirs="false" listfiles="true" listlinks="false"></ftp-list>
+				</var-def>
+				<!-- sub links list -->
+				<var-def name="sublinks"> 
+					<ftp-list path="${dirs.toList().get(0).toString()}" listdirs="false" listfiles="false" listlinks="true"></ftp-list>
+				</var-def>	
+				<!-- {{ show show got information on the monitor -->
+				<script><![CDATA[ 
+					// import timeUnit library for setup timeouts
+		           	import java.util.concurrent.TimeUnit;
+					// show info to the console
+					println "Root: "+dirs.toList().get(0).toString()+": sub directory list - "+dirs.toList();
+					println "Root: "+dirs.toList().get(0).toString()+": sub file list - "+files.toList();
+					println "Root: "+dirs.toList().get(0).toString()+": sub links list - "+links.toList();
+					// small waiting for view
+					TimeUnit.SECONDS.sleep(1);
+				]]></script>
+				<!-- }} show got information on the monitor -->				
+			</if>
+		</case>
+		<!-- }} check if we have folders in root directory 
+				try get subfolders and files for 1st directory in list-->
+	</ftp>
+	<!-- }} connect to the FTP remote dir "pub" and work with him -->
+ 	<export include-original-data="false">
+ 	</export>
+</config>

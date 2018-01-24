@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ set path to save file with data after parse -->
+	<var-def name="file_location">
+		c:/WFS_Work/WFS-output/products.xlsx	
+	</var-def>
+	<!-- }} set path to save file with data after parse -->
+    <selenium-flow>
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="true" start-in-private="true">
+            <script><![CDATA[
+            	// {{ import use library
+            	import java.util.concurrent.TimeUnit;
+				import com.google.gson.*;
+				import com.google.gson.reflect.TypeToken;    
+				// }} import use library        
+				// {{ get web driver and set his options
+                ieDriver = seleniumDriver.getWrappedObject(); 
+                ieDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES).pageLoadTimeout(1, TimeUnit.MINUTES);
+                // }} get web driver and set his options
+                // get web page
+                ieDriver.get("https://invoiceplane.workfusion.com");
+               	// {{ set login
+                login	= ieDriver.findElement(By.xpath("//input[@id='email']"));
+                login.click();
+                login.sendKeys("admin@workfusion.com");
+                // }} set login
+                // {{ set password
+                pwd		= ieDriver.findElement(By.xpath("//input[@id='password']"));
+                pwd.click();
+                pwd.sendKeys("o66Lc1Jn6Z");
+                // }} set password
+                // press "login" button
+                ieDriver.findElements(By.xpath("//input[@name='btn_login']")).get(0).click();
+                // press "Producs" in the up menu
+                ieDriver.findElement(By.xpath("//li[@class='dropdown'][4]/a[@class='dropdown-toggle']")).click();
+                // press "View products" in the child menu
+                ieDriver.findElement(By.xpath("//li[@class='dropdown open']/ul[@class='dropdown-menu']/li[2]/a")).click();
+                // make list for products info
+                def products = [];
+                // get all row with products
+                productTable = ieDriver.findElements(By.xpath("//table[@class='table table-striped']/tbody/tr"));
+                
+                for(row in productTable) {
+                	// make map for 1 product data
+                	product = [:];
+                	// get columns links
+                	element = row.findElements(By.xpath("./td"));
+                	// set product data to the map
+            		product["family"]				= element.get(0).getText();
+            		product["SKU"]					= element.get(1).getText();
+            		product["productName"]			= element.get(2).getText();
+            		product["productDescription"]	= element.get(3).getText();
+            		product["price"]				= element.get(4).getText();
+            		// add map with product data to the list
+            		products << product;
+                }
+                // {{ make Gson from list with data and return him to the sys var
+                gson		= new Gson(); 
+ 				productsData= gson.toJson(products);
+ 				sys.defineVariable("parsedProductData", productsData);
+ 				// }} make Gson from list with data and return him to the sys var
+          	]]></script>
+        </selenium>
+    </selenium-flow>
+	<!-- {{ convert JSON to the Excel doc -->
+    <var-def name="productExcel">
+		<list-to-excel format="xlsx">
+      		<var name="parsedProductData"/>
+    	</list-to-excel>
+    </var-def>
+    <!-- }} convert JSON to the Excel doc -->
+	<!-- {{ save Excel file to the disc -->
+	<file action="write" path="${file_location}" type="binary">
+		<var name="productExcel"/>
+	</file>    
+    <!-- {{ save Excel file to the disc -->
+    <!-- write file path to the output data -->
+    <export include-original-data="false">
+    	<single-column name="file_location" value="${file_location}"/>
+    </export>
+</config>

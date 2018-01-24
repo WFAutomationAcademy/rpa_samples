@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<script return='fileBytes'><![CDATA[      
+		import java.io.File;
+		import java.io.IOException;
+		import org.apache.commons.io.FileUtils;
+
+        strings = ["This is a test", "One More", "And 1 more again"];
+		file = new File("test.txt");
+		FileUtils.writeLines(file, strings);			
+		
+		fileBytes = FileUtils.readFileToByteArray(file);
+		
+		sys.defineVariable("fileBytes", fileBytes); 
+    ]]></script>
+ 
+    <var-def name="fileS3Location">
+        <s3 bucket="temp.bucket">
+            <s3-put path="results/my-super-file.txt"  content-type="text/plain" content-disposition="inline" acl="PublicRead">
+            	<var name="fileBytes"/>
+            </s3-put>
+        </s3>
+	</var-def>
+
+    <export include-original-data="true">
+    	<single-column name="file_path" value="${fileS3Location}"/>
+    </export>
+</config>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config">
+	<!-- Split tag have 2 variant options:
+			- com.freedomoss.crowdcontrol.webharvest.plugin.nlp.WordSplitter
+			- com.freedomoss.crowdcontrol.webharvest.plugin.nlp.SentenceSplitter - default splitter
+	-->
+    <!-- {{ split content into sentence (in this variant delimiter (". ") and if we have prhrase "sadsad . adada" then we get 2 sentece "sadsad ." and "adada") -->
+    <var-def name="splitted_by_sentences">
+        <split content="It is a wonderful day. The sun is shining."/>
+    </var-def>
+ 	<!-- }} split content into sentence (in this variant delimiter (". ") and if we have prhrase "sadsad . adada" then we get 2 sentece "sadsad ." and "adada") -->
+	<!-- {{ split content into word (in this variant space its delimiter and if we have prhrase " . " then "." it word) -->
+    <var-def name="splitted_by_words">
+        <split content="It is a wonderful day. The sun is shining." splitter="com.freedomoss.crowdcontrol.webharvest.plugin.nlp.WordSplitter"/>
+    </var-def>
+ 	<!-- }} split content by word (in this variant space its delimiter and if we have prhrase " . " then "." it word) -->
+	<!-- save split results -->
+    <export include-original-data="true">
+        <single-column name="splitted_by_sentences" value="${splitted_by_sentences}"/>
+        <single-column name="splitted_by_words"		value="${splitted_by_words}"/>
+    </export>
+</config>

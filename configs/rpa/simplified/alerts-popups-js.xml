@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot name="ie" driver="chrome" close-on-completion="true">
+			<script><![CDATA[
+			
+				open('https://rpa-tutorial.s3.amazonaws.com/trainings/alert.html')
+				
+				// Confirming a simple alert
+				$(byText('Simple Alert')).click()
+				sleep(2000)
+				confirm('A simple Alert')
+				
+				// Getting text and dismissing a Confirm popup
+				$(byXpath('//td[2]/button')).click()
+				alert_text = switchTo().alert().getText()
+				sleep(2000)
+				dismiss()
+				
+				// Typing into a Prompt popup and confirming
+				$('td:last-child > button').click()
+				sleep(2000)
+				switchTo().alert().sendKeys('sure')
+				confirm()
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false">
+		<single-column name="second_alert_text" value="${alert_text}"/>
+	</export>
+</config>

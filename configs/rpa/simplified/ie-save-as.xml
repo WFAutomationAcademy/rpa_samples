@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+	<robotics-flow>
+	
+		<robot name="c3po" driver="internet explorer" close-on-completion="false">
+			<script><![CDATA[
+				pageLoadTimeout(3 * 1000)
+				try {
+					open('https://rpa-tutorial.s3.amazonaws.com/trainings/ie-download.html')
+					$(byPartialLinkText('Portable Zip')).click()
+				} catch (org.openqa.selenium.TimeoutException ignored) {}
+
+				// Switch to 'Save' dialog by Alt+N
+				sendKeys(Keys.chord(Keys.LEFT_ALT, 'n'))
+
+				// By TAB > ARROW_DOWN > ARROW_DOWN > ENTER pull up 'Save As' and click context menu item
+				pressTab()
+				sendKeys(Keys.ARROW_DOWN)
+				sendKeys(Keys.ARROW_DOWN)
+				pressEnter()
+			]]></script>
+		</robot>
+		
+		<robot name="bsod" driver="desktop" close-on-completion="true">
+			<script><![CDATA[
+				// Switching to 'Save As' window
+				switchTo().window('[TITLE:Save As]')
+
+				// Entering full path of file to be saved
+				def tempPath = System.getProperty("java.io.tmpdir")
+				uniqueId = "${UUID.randomUUID()}.json"
+				def savePath = tempPath + uniqueId
+				$('[CLASS:Edit;INSTANCE:1]').sendKeys(savePath).pressEnter()
+
+				sleep(1000)
+				// saving file content to a byte array
+				file_content = downloadFileFromAgent(savePath)
+			]]></script>
+		</robot>
+		
+		<robot name="c3po" driver="internet explorer" close-on-completion="true"/>
+
+	</robotics-flow>
+
+	<!-- creating a file on S3 storage -->
+	<var-def name="file_s3_location">
+		<s3 bucket="temp.bucket">
+			<s3-put path="_r2d2/${uniqueId}" content-type="application/json" content-disposition="inline" acl="PublicRead">
+				<script return='file_content' />
+			</s3-put>
+		</s3>
+	</var-def>
+
+	<export include-original-data="true">
+		<single-column name="file_s3_location" value="${file_s3_location}"/>
+	</export>
+</config>

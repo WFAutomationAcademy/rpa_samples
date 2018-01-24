@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- for scenario need data file with search phones 
+
+Sample content for file:
+
+9679579903
+9873606553
+9899069918
+9811323370
+-->
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<selenium-flow>
+		<selenium name="seleniumDriver" browser="internet explorer" close-on-completion="true" start-in-private="true">
+			<script><![CDATA[
+			// {{ import libraries
+			import java.util.concurrent.TimeUnit;
+		  	import java.io.BufferedReader;
+			import java.io.File;
+			import java.io.FileNotFoundException;
+			import java.io.FileReader;
+        	// }} import libraries
+        	// {{ get web driver and setup it
+        	ieDriver = seleniumDriver.getWrappedObject();
+        	ieDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES).pageLoadTimeout(1, TimeUnit.MINUTES);
+			// }} get web driver and setup it
+			// temp var for search number	            	
+			def searchPhone = "";
+			// list for save output data
+			def finalData = [];
+			// path to the file with search phones list
+			def phoneListPath = "C:/WFS_Work/phoneList.txt";
+			// try block with read phone list and search
+			try {
+				// buffer for read phones
+				phoneData = new BufferedReader(new FileReader(phoneListPath));
+				// iterrator by phone list
+				while((searchPhone=phoneData.readLine())!=null) {	
+					// get search page
+					ieDriver.get("http://www.nccptrai.gov.in/nccpregistry/search.misc");
+					// set search phone
+					phoneno = ieDriver.findElement(By.name("phoneno"));
+					phoneno.click();
+					phoneno.clear();
+					phoneno.sendKeys(searchPhone);
+					// wait for view
+					TimeUnit.SECONDS.sleep(2);
+					// sumbmit search
+					ieDriver.findElement(By.name("submit1")).click(); 
+					// map for save search data
+					info = [:];
+					// save search number
+					info["mobile"] = searchPhone;
+					// save number main status
+					info["status"] = ieDriver.findElement(By.xpath("/html/body/table[2]/tbody/tr[2]/td/form/table[1]/tbody/tr[3]/td[3]/b/font")).getText();
+					// if main status not 'Never registred', then save 'add status'
+					if(!info["status"].equals("Never Registered")) {
+						info["add_status"] = ieDriver.findElement(By.xpath("/html/body/table[2]/tbody/tr[2]/td/form/div/table/tbody/tr[3]/td[3]")).getText();
+					} else {
+						info["add_status"] = "";
+					}
+					// write map with data to the output data list
+					finalData << info;
+				}
+				// close buffer for read phones
+				phoneData.close();
+			} catch (FileNotFoundException e) {
+				// WO throw exception
+			}
+			// close web driver
+			ieDriver.close(); 
+			// return output data list to the systems var
+			sys.defineVariable("finalData", finalData);
+			]]></script>
+		</selenium>
+	</selenium-flow>
+	<!-- SAVE OUTPUT DATA -->
+	<export include-original-data="false">
+ 		<multi-column list="${finalData}" split-results="true">
+			<put-to-column-getter name="mobile" property="mobile"/>
+			<put-to-column-getter name="status" property="status"/>
+			<put-to-column-getter name="add_status" property="add_status"/>
+        </multi-column>
+	</export>  
+</config>
+

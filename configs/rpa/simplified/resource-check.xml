@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+    <robotics-flow>
+        <robot driver="desktop" close-on-completion="true" name="desktopDriver">
+            <script><![CDATA[
+
+                String s3Path = "https://rpa-grid.s3.amazonaws.com/integration-test/excel/test_poi.xlsx";
+                String filePath = downloadFileOnAgent(s3Path);
+
+                boolean exist = Resource.exist(filePath);
+                sys.defineVariable("is_existing", exist);
+
+                boolean existFalse = Resource.exist(filePath+".tmp");
+                sys.defineVariable("is_existing_tmp", existFalse);
+
+                Thread.sleep(3000);
+             ]]></script>
+        </robot>
+    </robotics-flow>
+    
+
+    
+    <export include-original-data="true">
+    	<single-column name="existing_file" value="${is_existing}"/>
+    	<single-column name="fake_file" value="${is_existing_tmp}"/>
+    </export>
+
+</config>

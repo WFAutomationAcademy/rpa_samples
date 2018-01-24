@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot name="ie" driver="chrome" close-on-completion="true">
+			<script><![CDATA[
+			
+				pageLoadTimeout(10000)
+				open('https://rpa-tutorial.s3.amazonaws.com/trainings/iframe/iframe-test.html')
+
+				// Step 1: Switching to the 1st frame, frame index 0
+				switchTo().frame(0)
+				
+				// Step 2: Find the First and Last name fields
+				def firstName = $(byXpath("//form/fieldset//input[1]"))
+				def lastName = $(byXpath("//form/fieldset/div[11]/input"))
+				
+				// Step 3: Fill some value in the fields
+				firstName.sendKeys('Sanal')
+				lastName.sendKeys('Singh')
+				
+				// Step 4: Switching to the nested frame, getting its text
+				def nestedFrame = $(byXpath('//iframe'))
+				switchTo().frame(nestedFrame)
+				nestedFrameText = $('cite').getText()
+				
+				// Step 5: Switching to the 2nd frame using its id
+ 				switchTo().defaultContent()
+ 				switchTo().frame('IF1')
+ 				
+ 				// Step 6: Find the search field and perform search
+ 				$(byId('searchInput')).val('Robotic Process Automation').pressEnter()
+ 				
+ 				// Trying to click elements in another iframe
+ 				try {
+					firstName.sendKeys("New Name")
+				} catch (Exception e) {
+					executeScript("alert('Cannot click on other iframe elements! Switch to that iframe first')")
+					sleep(3000)
+					confirm()
+				}
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false">
+		<single-column name="nestedFrameText" value="${nestedFrameText}"/>
+	</export>
+</config>

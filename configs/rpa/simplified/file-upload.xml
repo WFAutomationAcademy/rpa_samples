@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+ 
+    <robotics-flow>
+        <robot name="bb8" driver="desktop" close-on-completion="true">
+            <script> <![CDATA[
+            
+            	// Copy the file to the RPA machine.
+		        def s3Path = 'https://rpa-tutorial.s3.amazonaws.com/trainings/pdf-sample.pdf'
+            	filePath = downloadFileOnAgent(s3Path)
+            	
+            ]]></script>
+        </robot>
+     
+        <robot name="webRobot" driver="internet explorer" close-on-completion="false" start-in-private="true">
+            <script><![CDATA[
+            	
+            	def loginPage = 'http://mail.google.com'
+		        def username = your mail goes here
+		        def password = your password goes here
+		        def mailSubject = 'Attach PDF'
+		        def mailBody = 'This is an RPA message with attached PDF file.'
+            	
+                timeouts(20 * 1000)
+                
+                // Login into the mail system            
+                open(loginPage)
+                $('#identifierId').val(username).pressEnter()
+                $(byXpath("//*[@name='password']")).val(password)
+                $('#passwordNext').click()
+    			
+    			// Populate new message fields
+                $(byText('COMPOSE')).click();          
+                $(By.name('to')).val(username).pressTab()
+                $(by('placeholder', 'Subject')).val(mailSubject).pressTab()
+                $('.editable').val(mailBody).pressEnter()
+                
+                // Start attaching file.
+                $(byXpath("//div[@class='a1 aaA aMZ']")).click()
+               
+            ]]></script>
+        </robot>
+         
+        <robot name="r2d2" driver="desktop" close-on-completion="true">
+        	<capability name="SEARCH_ALL_WINDOWS" value="true" />
+            <script><![CDATA[
+            
+                // Attach file using "upload file" dialog.
+                switchTo().window('[CLASS:#32770]')
+                $('[CLASS:Edit;INSTANCE:1]').sendKeys(filePath)
+                $('[CLASS:Button;INSTANCE:1]').click()
+                
+            ]]></script>
+        </robot>
+         
+        <robot name="webRobot" driver="internet explorer" close-on-completion="true">
+            <script><![CDATA[
+            
+                $(byText('Send')).click() 
+                $(withText('Your message has been sent.')).shouldBe(VISIBLE)
+                sleep(3000)
+                
+            ]]></script>
+        </robot>
+    </robotics-flow>
+        
+    <export include-original-data="false">   
+        <single-column name="rpa_local_file_path" value="${filePath}"/>
+    </export>
+     
+</config>

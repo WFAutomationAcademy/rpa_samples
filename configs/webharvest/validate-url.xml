@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ set start url for check validation -->
+	<var-def name="beginURL">
+		<template>tut.by</template>
+	</var-def>
+	<!-- {{ set start url for check validation -->
+	<!-- {{ replace all space on site url and change case to low -->
+	<var-def name="site">
+		<template>${beginURL.toString().trim().replace(" ", "").toLowerCase()}</template>
+	</var-def>
+	<!-- }} replace all space on site url and change case to low -->
+	<!-- {{ make regexp for first check url -->
+	<var-def name="regexp">
+		<template>^((https:\/\/)|(http:\/\/))(.*)[.](.*)$</template>
+	</var-def>
+	<!-- {{ make regexp for first check url -->
+	<!-- {{ first check url by reg exp and modify if it need -->
+	<case>
+		<if condition="${!site.toString().isEmpty() &amp;&amp; !site.toString().equalsIgnoreCase('n/a') &amp;&amp; !site.toString().matches(regexp.toString())}">
+			<var-def name="site">
+				<template>http://${site}</template>
+			</var-def>
+		</if>
+	</case>
+	<!-- }} first check url by reg exp and modify if it need -->
+	<!-- {{ second check url by reg exp after modify -->
+	<case>
+		<if condition="${!site.toString().matches(regexp.toString())}">
+			<var-def name="url">
+				<template>n/a</template>
+			</var-def>
+		</if>
+		<else>
+			<var-def name="url">
+				<template>${site}</template>
+			</var-def>
+		</else>
+	</case>
+	<!-- }} second check url by reg exp after modify -->
+	<!-- {{ declare default values for data -->
+	<var-def name="valid">false</var-def>
+	<var-def name="endUrl"></var-def>
+	<var-def name="siteStatus"></var-def>
+	<var-def name="statusCode"></var-def>
+	<var-def name="statusText"></var-def>
+	<var-def name="attemptsCount">0</var-def>
+	<var-def name="content"></var-def>
+	<!-- }} declare default values for data -->
+	<!-- {{ check URL and get validation info about site from 'url-validator' service -->
+	<case>
+		<if condition='${!url.toString().equalsIgnoreCase("n/a")}'>
+			<!-- {{ get info from validator service by URL -->
+			<var-def name='validation'>
+				<url-validator url-column='${url}'/>
+			</var-def>
+			<!-- }} get info from validator service by URL -->
+			<!-- {{ get content from validation info -->
+			<var-def name="content">
+				<template>${validation.toList().get(0).getWrappedObject().getContent()}</template>
+			</var-def>
+			<!-- }} get content from validation info -->\
+			<!-- {{ make class for expanded checking url and content -->
+			<script>
+				<![CDATA[
+					class urlChecker{
+						boolean isDomainRegistratorUrl(String url) {
+							return 
+							(url.matches("(?si).*\\Qgoname.com\\E.*") 
+							|| url.matches("(?si).*\\Qhugedomains.com\\E.*")
+							|| url.matches("(?si).*\\Q?reqp=1&reqr=\\E.*"));
+						}
+	
+						boolean isDomainRegistratorHtml(String html) {
+							return
+							
+							(html.matches("(?smi).*\\Q<frame src=\"search_caf.php?uid=\\E.*") 
+							|| html.matches("(?smi).*\\Qsearchremagnified.com/sk-domsale.php\\E.*") 
+							|| html.matches("(?smi).*\\Qgooglesyndication.com/apps/domainpark/show_afd_ads.js\\E.*") 
+							|| html.matches("(?smi).*\\Qsecurepaynet.net/parked/park.aspx\\E.*") 
+							|| html.matches("(?smi).*\\Qhttp://ww2.\\E.*\\Q/?folio=\\E.*") 
+							|| html.matches("(?smi).*\\Qhttp://mcc.godaddy.com/park/\\E.*") 
+							|| html.matches("(?smi).*\\Qno longer in business\\E.*"));
+						}
+	
+						boolean isTemporarilyUnavailable(String html) {
+							return
+							(html.contains("Server Error") 
+							|| html.contains("Service Unavailable") 
+							|| html.contains("Service Temporarily Unavailable") 
+							|| html.contains("Site Temporarily Unavailable") 
+							|| html.contains("The service is unavailable") 
+							|| html.contains("Internal server error"));
+						}
+	
+						String getRefreshUrl(String url, String html) {
+							def regExpMask = "(?smi).*<meta\\s+http-equiv=[\"']{1}refresh[\"']{1}\\s+content=[\"']{1}[^\n]*url='?([^\n\"']*)'?[\"']{1}\\s*/?>.*";
+							if (html.matches(regExpMask)) {
+								fullUrl = sys.fullUrl(url, html.replaceAll(regExpMask, '$1').trim());
+								return fullUrl.toString().toLowerCase().contains("javascript:") ? "" : fullUrl; 
+							} else {
+								return "";
+							}
+						}
+					}
+					// bind class
+					binding.putAt("urlChecker", new urlChecker());
+				]]>
+			</script>
+			<!-- }} make class for expanded checking url and content -->			
+			<!-- {{ receiving an refreshedUrl using the created class -->
+			<var-def name="refreshedUrl">
+				<template>${urlChecker.getRefreshUrl(url.toString(), content.toString())}</template>
+			</var-def>
+			<!-- }} receiving an refreshedUrl using the created class -->
+			<!-- {{ if refreshedURL is not empty then get validation info by refreshedURL -->
+			<case>
+				<if condition='${!refreshedUrl.toString().equals("")}'>
+					<var-def name='validation'>
+						<url-validator url-column='${refreshedUrl}'/>
+					</var-def>
+				</if>
+			</case>
+			<!-- }} if refreshedURL is not empty then get validation info by refreshedURL -->
+			<!-- {{ set validation info to values for data -->
+			<var-def name="valid">
+				<template>${validation.toList().get(0).getWrappedObject().valid}</template>
+			</var-def>
+			<var-def name="endUrl">
+				<template>${validation.toList().get(0).getWrappedObject().endUrl}</template>
+			</var-def>
+			<var-def name="statusCode">
+				<template>${validation.toList().get(0).getWrappedObject().statusCode}</template>
+			</var-def>
+			<var-def name="statusText">
+				<template>${validation.toList().get(0).getWrappedObject().statusText}</template>
+			</var-def>
+			<var-def name="attemptsCount">
+				<template>${validation.toList().get(0).getWrappedObject().attemptsCount}</template>
+			</var-def>
+			<!-- {{ set validation info to values for data -->
+			<!-- {{ check validation statu codes and information -->
+			<var-def name="isErrorCode">
+				<script return='statusCode.toString().matches("^(4|5)\\d{2}")'/>
+			</var-def>
+			
+			<case>
+				<!-- {{ if code invalid set sute status INVALID -->
+				<if condition='${isErrorCode.toBoolean()}'>
+					<var-def name="siteStatus">INVALID</var-def>
+				</if>
+				<!-- }} if code invalid set sute status INVALID -->
+			</case>
+			
+			<case>
+				<!-- {{ check may be site temporarily unavailable -->
+				<if condition='${statusCode.toString().equals("503") || urlChecker.isTemporarilyUnavailable(content.toString())}'>
+					<var-def name="siteStatus">TEMPORARILY_UNAVAILABLE</var-def>
+				</if>
+				<!-- }} check may be site temporarily unavailable -->
+			</case>
+			
+			<case>
+				<!-- {{ if site status Empty check may be site Expired or Invalid-->
+				<if condition="${siteStatus.toString().length() == 0}">
+					<case>
+						<if condition="${urlChecker.isDomainRegistratorUrl(url.toString()) || urlChecker.isDomainRegistratorHtml(content.toString())}">
+							<var-def name="siteStatus">EXPIRED</var-def>
+						</if>
+					</case>
+					<case>
+						<if condition='${content.toString().contains("X5 Networks Support Department")}'>
+							<var-def name="siteStatus">INVALID</var-def>
+						</if>
+					</case>
+				</if>
+				<!-- {{ if site status Empty check may be site Expired -->
+			</case>
+			<!-- {{ if all checks haven't worked above then site ACTIVE -->
+			<case>
+				<if condition="${siteStatus.toString().length() == 0}">
+					<var-def name="siteStatus">ACTIVE</var-def>
+				</if>
+			</case>
+			<!-- }} if all checks haven't worked above then site ACTIVE -->
+			<!-- }} check validation statu codes -->
+		</if>
+	</case>
+	<!-- }} check URL and get validation info about site from 'url-validator' service -->
+	<!-- {{ export validation information -->
+	<export include-original-data="true">
+		<single-column name="beginURL" value="${beginURL}"/>
+		<single-column name="URL" value="${url}"/>
+		<single-column name="endUrl" value="${endUrl}"/>
+		<single-column name="valid" value="${valid}"/>
+		<single-column name="siteStatus" value="${siteStatus}"/>
+		<single-column name="statusCode" value="${statusCode}"/>
+		<single-column name="statusText" value="${statusText}"/>
+		<single-column name="attemptsCount" value="${attemptsCount}"/>
+	</export>
+	<!-- }} export validation information -->
+</config>

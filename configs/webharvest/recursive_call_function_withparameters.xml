@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ define var with path to the main structure folder -->
+	<var-def name="savePathForFiles">
+		output
+	</var-def>
+	<!-- {{ define var with path to the main structure folder -->
+	<script><![CDATA[ 
+		// parent folder list
+		list 		= ["lst1","lst2","lst3","lst4"];
+		// sublist folder for folder "lst2/*"
+		sublst2		= ["sub1","sub2"];
+		// sublist folder for folder "lst2/*"
+		sublst3		= ["odin", "dva"];
+		// sublist folder for folder "lst2/sub2/*"
+		sublst2_2	= ["xxxx", "gggg"];
+		
+		// define var
+		sys.defineVariable("list", list);
+		sys.defineVariable("lst2", sublst2);
+		sys.defineVariable("lst3", sublst3);
+		sys.defineVariable("sub2", sublst2_2);
+		
+		// bind parent folder list name
+		binding["parent"]	= "list";
+	]]></script>
+	<!-- {{ function for loop folder list and create folder -->
+	<function name="loopFolderData">
+		<loop item="folderName">
+			<!-- {{ current folder list -->
+			<list>
+				<var name="${listFolderName}"/>
+			</list>
+			<!-- }} current folder list -->
+			<body>
+				<!-- {{ create folder with temp file -->
+				<file path="${parentFolder}${folderName.toString()}\tmp.crkfolder" action="write"></file>
+				<!-- }} create folder with temp file -->
+				<!-- {{ check if folder have sub directory then call function "loopFolderData" for sub folder list -->
+				<case>
+					<if condition="${folderName.toString().equals('lst2') || folderName.toString().equals('lst3') || folderName.toString().equals('sub2')}">
+						<!-- {{ call function -->
+						<call name="loopFolderData">
+							<!-- {{ set function paramenetrs -->
+							<call-param name="listFolderName">
+					            <template>${folderName.toString()}</template>
+					        </call-param>
+					       	<call-param name="parentFolder">
+					        	<template>${parentFolder}${folderName.toString()}\</template>
+					        </call-param>	
+					        <!-- }} set function paramenetrs -->
+						</call>
+						<!-- }} call function -->
+					</if>
+				</case>
+				<!-- }} check if folder have sub directory then call function "loopFolderData" for sub folder list -->
+			</body>
+		</loop>
+	</function>
+	<!-- }} function for loop folder list and create folder -->
+	<!-- {{ call function for main list (1st iteration) -->
+	<call name="loopFolderData">
+		<!-- {{ set function paramenetrs -->
+		<call-param name="listFolderName">
+            <template>${parent}</template>
+        </call-param>
+        <call-param name="parentFolder">
+        	<template>${savePathForFiles.toString()}</template>
+        </call-param>
+        <!-- }} set function paramenetrs -->	
+	</call>
+	<!-- }} call function for main list (1st iteration) -->
+	<export include-original-data="false"></export>
+</config>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ select data from datastore -->
+    <var-def name="result_data">
+        <datastore name="Company_DATA">
+            <template>select * from @this </template>
+        </datastore>
+    </var-def>
+    <!-- }} select data from datastore -->
+	<!-- {{ split selected data by row -->
+    <var-def name="rowsList">
+        <xpath expression="//row">
+            <html-to-xml>
+            	<var name="result_data"/>
+            </html-to-xml>
+        </xpath>
+    </var-def>
+    <!-- }} split selected data by row -->
+	<!-- {{ loop by row from split -->
+    <loop item="row" index="idxr">
+        <list>
+            <var name="rowsList"/>    
+        </list>
+        <body>
+			<!-- {{ loop by fields in row -->
+			<loop item="field" index="idxf">
+				<list>
+					<xpath expression="//row/*">
+		            	<var name="row"/>
+			        </xpath>
+				</list>
+				<body>
+					<!-- {{ get field name -->
+					<var-def name="field_name">
+						<xpath expression="//name()">
+			            	<var name="field"/>
+				        </xpath>
+					</var-def>
+					<!-- }} get field name -->
+					<!-- {{ get field data -->
+					<var-def name="field_text">
+						<xpath expression="//text()">
+			            	<var name="field"/>
+				        </xpath>
+					</var-def>
+					<!-- }} get field data -->
+					<!-- {{ if it no system field, log it -->
+					<case>
+						<!-- checking system fields by REGEXP -->
+						<if condition="${!field_name.toString().matches('^(ds_)(.*)(_id$)')}">
+							<log message="Field '${field_name}' from row ${idxr} contain data '${field_text}'" level="ERROR"/>
+						</if>
+					</case>
+					<!-- {{ if it no system field, log it -->
+				</body>
+			</loop> 
+			<!-- }} loop by fields in row -->    
+        </body>
+    </loop>
+    <!-- }} loop by row from split -->
+    <export include-original-data="false">
+    </export>
+</config>

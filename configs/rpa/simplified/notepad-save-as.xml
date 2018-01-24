@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+ 
+    <robotics-flow>
+        <robot name="bb8" driver="desktop" close-on-completion="true">
+        	<capability name="SEARCH_ALL_WINDOWS" value="true" />
+            <script> <![CDATA[
+            
+            	def path = System.getProperty("java.io.tmpdir") + 'new.txt'
+            	Resource.createFileOverwrite(path)
+            	Resource.append(path, 'This is a content of the temporary txt file', 'utf-8')
+            	
+        		open('notepad.exe ' + path)
+                switchTo().window('[CLASS:Notepad]')
+                sleep(500)
+                
+                editor = $('[CLASS:Edit; INSTANCE:1]')
+                
+                // Navigate to the document's end
+                editor.sendKeys('^{END}')
+                
+                // Add new content
+                editor.sendKeys("\n\nThis is a new content which is added by \"WorkFusion Bot\".")
+                
+                // Try to close the notepad.
+                driver().close()
+                sleep(500)
+                 
+                // Switch to the "Save changes" dialog.
+                switchTo().window('[CLASS:#32770]')
+                
+                // Click on "Save" button.
+                $('[CLASS:Button; INSTANCE:1]').click()
+                sleep(2000)
+                
+                //Validating result
+                open('notepad.exe ' + path)
+                sleep(2000)
+            	
+            ]]></script>
+        </robot>
+    </robotics-flow>
+    <export include-original-data="false"/>
+</config>

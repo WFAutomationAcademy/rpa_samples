@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+ 
+    <robotics-flow>
+        <robot name="bb8" driver="desktop" close-on-completion="true">
+        	<capability name="SEARCH_ALL_WINDOWS" value="true" />
+            <script> <![CDATA[
+                
+                rpaVariables = new HashMap()
+            	def appletUrl = 'https://rpa-tutorial.s3.amazonaws.com/demo/jfc/SwingSet2/SwingSet2.jar'
+                timeouts(40 * 1000)
+ 
+                def localPath = downloadFileOnAgent(appletUrl)
+                open("java -jar ${localPath}")
+                
+                switchTo().window('[CLASS:SunAwtFrame; TITLE:SwingSet2]')
+                
+                $('[CLASS: JToggleButton; TOOLTIP:JTree demo]').click()
+                sleep(1000)
+                
+                // getting tree node attributes
+                rpaVariables.put('get_width', $('[CLASS:JTree]').getAttribute('getWidth'))
+                rpaVariables.put('get_height', $('[CLASS:JTree]').getAttribute('getHeight'))
+                
+                $('[CLASS:JTree; TEXT:Rock; LEVEL:1]').sendKeys('{RIGHT}')
+                sleep(1000)
+                $('[CLASS:JTree; TEXT:Komeda]').sendKeys('{RIGHT}')
+                sleep(1000)
+                $('[CLASS:JTree; TEXT:Genius Of; LEVEL:3]').sendKeys('{RIGHT}')
+                sleep(1000)
+                
+                rpaVariables.put('level', $('[CLASS:JTree; TEXT:More Is More; LEVEL:4]').getAttribute('LEVEL'))
+                
+                $('[CLASS:JTree; TEXT:More Is More; LEVEL:4]').sendKeys('{RIGHT}')
+                sleep(1000)
+                $('[CLASS:JTree; PATH: Music|Classical|Beethoven|Quartets]').sendKeys('{RIGHT}')
+                sleep(1000)
+                $('[CLASS:JTree; PATH: Music|Classical|Beethoven|Quartets|Six String Quartets]').sendKeys('{RIGHT}')
+                sleep(1000)
+                
+                // using regexp in selectors
+                $('[CLASS:JTree; PATH: Music|Clas.*cal|Br.*ms|Conc.*tos]').sendKeys('{RIGHT}')
+                sleep(3000)
+                
+            ]]></script>
+        </robot>
+    </robotics-flow> 
+    <export include-original-data="false">
+        <loop item="rpaVar">
+            <list>
+            	<script return="keys">
+                    keys = new ArrayList(rpaVariables.keySet())
+                </script>
+            </list>
+            <body>
+                <single-column name="${rpaVar}">
+                    <template>${rpaVariables.get(rpaVar.toString())}</template>
+                </single-column>
+            </body>
+        </loop>
+    </export>
+</config>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- {{
+For this example need file with input data.
+
+File format *.csv
+
+loginPage - email URL (http://mail.google.com)
+username - email (test@gmail.com)
+receiver - email (test@gmail.com)
+password - password to the enter
+mailSubject - text (message subject)
+mailBody - text (message content)
+
+ -->
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+    <selenium-flow>
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="true" start-in-private="true">
+            <script><![CDATA[
+				// import timeUnit library for setup timeouts
+            	import java.util.concurrent.TimeUnit;
+       			 
+                ieDriver = seleniumDriver.getWrappedObject();
+                ieDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES).pageLoadTimeout(1, TimeUnit.MINUTES);
+				
+				// get mail login page
+                ieDriver.get(loginPage.toString());
+                
+                // set account login
+                EmailAdr	= ieDriver.findElement(By.id("Email"));
+                EmailAdr.click();
+                EmailAdr.sendKeys(username.toString());
+               
+                // go to the next page for set password
+                ieDriver.findElement(By.id("next")).click();
+                
+                // set account password
+                textBox		= ieDriver.findElement(By.id("Passwd"));
+                textBox.click();
+                textBox.sendKeys(password.toString());
+                
+                // enter to the mail
+                ieDriver.findElement(By.id("signIn")).click();
+               
+               	// creating new message
+                ieDriver.findElement(By.xpath("//div[text()='COMPOSE']")).click();
+                
+                // set message destination
+                to = ieDriver.findElement(By.name("to"));
+                to.click();
+                to.sendKeys(receiver.toString());
+                
+                // set message subject
+                subject = ieDriver.findElement(By.name("subjectbox"));
+                subject.click();
+                subject.sendKeys(mailSubject.toString());
+                
+                // set message text
+                body = ieDriver.findElement(By.xpath("//div[@aria-label='Message Body']"));
+                body.click();
+                body.sendKeys(mailBody.toString());
+
+                // Send the message.
+                ieDriver.findElement(By.xpath("//div[text()='Send']")).click();
+
+				// wait 10 seconds for viewing after autoupdate
+				TimeUnit.SECONDS.sleep(10);
+            ]]></script>
+        </selenium>
+    </selenium-flow>
+    <export include-original-data="false"/>
+</config>

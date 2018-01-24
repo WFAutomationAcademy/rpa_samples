@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<script><![CDATA[			        
+	    recordsToExport = [];
+		
+		record = [:];
+		record["username"]	= "user1";
+		record["status"]	= "Account created successfully";
+					     
+		recordsToExport << record;
+		 
+		record = [:];
+		record["username"]	= "user2";
+		record["status"]	= "Account not created. Already exists or error in attributes";				     
+		    
+		recordsToExport << record;
+		     			                     	                  								
+		sys.defineVariable("recordsToExport", recordsToExport, true);                                  
+	]]></script>
+
+    <export include-original-data="false">
+    	<multi-column list="${recordsToExport.getWrappedObject()}" split-results="true">
+            <put-to-column-getter name="username" property="username" />
+            <put-to-column-getter name="status" property="status" />
+        </multi-column>
+    </export>
+</config>

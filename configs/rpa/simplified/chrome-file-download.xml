@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+	<script><![CDATA[
+		// Set your download directory here
+		downloadDir = System.getProperty("java.io.tmpdir")
+		
+		getLastModifiedFileName = {RemoteWebDriver aDriver, String dirPath ->
+			return (String) aDriver.executeScript(
+					"    File dir = new File(\"" + dirPath.replace('\\', '/') + "\");\n" +
+					"    File[] files = dir.listFiles();\n" +
+					"    if (files == null || files.length == 0) {\n" +
+					"        return null;\n" +
+					"    }\n" +
+					"\n" +
+					"    File lastModifiedFile = new File(\"" + dirPath.replace('\\', '/') + "some-cool-video.zip\");\n" +
+					"return lastModifiedFile.getAbsolutePath();"
+					, "GROOVY");
+		}
+
+		getFileContent = {RemoteWebDriver aDriver, String absoluteFilePath ->
+			Object res = aDriver.executeScript(
+					"def bytes = new File('" + absoluteFilePath.replace('\\', '/') + "').bytes; \n"
+					+ "return Base64.getEncoder().encodeToString(bytes);", "GROOVY");
+
+			byte[] content = Base64.getDecoder().decode(res.toString());
+			return content;
+		}
+
+		getDownloadedFile = {RemoteWebDriver desktopDriver, String downloadDir, String latestFilePath ->
+			String downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
+
+			// Wait until new file appears.
+			int maxCounter = 1000;
+			boolean downloadStarted = downloadFilePath != null && !downloadFilePath.equals(latestFilePath);
+			while (!downloadStarted && maxCounter > 0) {
+				Thread.sleep(10);
+				downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
+				downloadStarted = downloadFilePath != null && !downloadFilePath.equals(latestFilePath);
+				maxCounter--;
+			}
+
+			// Lets wait until latest file is not tmp or crdownload.
+			if (downloadStarted) {
+				maxCounter = 300;
+				downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
+				String fileExtension = org.apache.commons.io.FilenameUtils.getExtension(downloadFilePath);
+				boolean isDownloading = "crdownload".equals(fileExtension) || "tmp".equals(fileExtension);
+
+				while (isDownloading && maxCounter > 0) {
+					Thread.sleep(100);
+					downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
+					fileExtension = org.apache.commons.io.FilenameUtils.getExtension(downloadFilePath);
+					isDownloading = "crdownload".equals(fileExtension) || "tmp".equals(fileExtension);
+
+					maxCounter--;
+				}
+				if (!isDownloading) {
+					return getFileContent(desktopDriver, downloadFilePath);
+				}
+			}
+
+			throw new Exception("Some issues during file download");
+		}
+	]]></script>
+
+	<robotics-flow>
+		<robot name="desktopDriver" driver="desktop" close-on-completion="false">
+			<script><![CDATA[
+			
+				aDriver = driver()
+				latestFilePath = getLastModifiedFileName(aDriver, downloadDir)
+				
+			]]></script>
+		</robot>
+
+		<robot name="robotDriver" driver="chrome" close-on-completion="true"
+			start-in-private="true">
+			<script><![CDATA[
+			
+				open('http://wf-sharebox.s3.amazonaws.com/some-cool-video.zip')
+				documentContent = getDownloadedFile(aDriver, downloadDir, latestFilePath)
+				
+			]]></script>
+		</robot>
+
+		<script><![CDATA[
+			try {
+				aDriver.quit()
+			} catch(Exception ignore) {}
+		]]></script>
+	</robotics-flow>
+
+	<!-- Upload to s3 or whatever other actions. -->
+
+	<!-- Export your values -->
+	<export include-original-data="true">
+		<single-column name="content" value="${documentContent}"></single-column>
+	</export>
+
+</config>

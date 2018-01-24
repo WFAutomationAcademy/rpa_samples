@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	
+	<robotics-flow>
+		<!-- Internet explorer driver -->
+		<robot name="webDriver" driver="chrome" close-on-completion="true" start-in-private="true">
+			<script><![CDATA[
+				timeouts(15 * 1000)
+				open("http://www.w3schools.com/html/html_tables.asp")
+				pageSource = driver().getPageSource()
+				// or just use <http> plug-in https://kb.workfusion.com/display/WF/http-extended
+			]]></script>
+		</robot>
+	</robotics-flow>
+
+	<var-def name="xmlSource">
+		<html-to-xml>
+			<script return="pageSource" />
+		</html-to-xml>
+	</var-def>
+
+	<var-def name="tableXml">
+		<xpath expression="//table[@id='customers']">
+			<script return="xmlSource" />
+		</xpath>
+	</var-def>
+
+	<script><![CDATA[
+		rpaVariables = new HashMap()
+		// uncomment these lines if you want to see source data
+		//rpaVariables.put("source", xmlSource.toString())
+		//rpaVariables.put("tableXml", tableXml.toString())
+	]]></script>
+
+	<loop item="rowXml" index="idx">
+		<list>
+			<xpath expression="//tr">
+				<script return="tableXml" />
+			</xpath>
+		</list>
+		<body>
+			<script><![CDATA[
+				 values = new ArrayList()
+			]]></script>
+
+			<loop item="valString">
+				<list>
+					<xpath expression="//td/text()">
+						<var name="rowXml" />
+					</xpath>
+				</list>
+				<body>
+					<script><![CDATA[
+						values.add(valString.toString())
+					]]></script>
+				</body>
+			</loop>
+
+			<script><![CDATA[
+				rpaVariables.put("row_" + idx.toString(), values.toString())
+			]]></script>
+		</body>
+	</loop>
+
+	<!-- Export values to the output CSV file -->
+	<export include-original-data="true">
+		<loop item="rpaVar">
+			<list>
+				<script return="keys">
+					keys = new ArrayList(rpaVariables.keySet())
+				</script>
+			</list>
+			<body>
+				<single-column name="${rpaVar}">
+					<template>${rpaVariables.get(rpaVar.toString())}</template>
+				</single-column>
+			</body>
+		</loop>
+	</export>
+</config>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="beanshell">
+
+	<var-def name="sync_datastore">sync_bp</var-def>
+	<var-def name="sync_variable">sync_bp_flag</var-def>
+	<var-def name="sync_variable_set_value">BUSY</var-def>
+		
+    <datastore name="${sync_datastore}" max="1">
+		<template>
+			update @this set ${sync_variable}='${sync_variable_set_value}'
+        </template>
+	</datastore>
+ 	
+	<var-def name="syncRecord">
+		<datastore name="${sync_datastore}" max="1">
+			<template>
+				select * from @this
+			</template>
+		</datastore>
+	</var-def>
+	 
+	<export include-original-data="true">
+		<var-def name="value">
+			<xpath expression='/row/${sync_variable}/text()'>
+	    		<var name="syncRecord"/>
+			</xpath>
+		</var-def>
+	  	<single-column name="is_running" value="${value}"/>                
+	</export>
+</config>

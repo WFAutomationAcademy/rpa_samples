@@ -1,0 +1,2 @@
+loginPage,username,receiver,password,mailSubject,mailBody,targetFilePath
+http://mail.google.com,tuk.tuk.rpa@gmail.com,tuk.tuk.rpa@gmail.com,freedom4ROBOT,Attach PDF,This is an RPA message with attached PDF file.,https://s3.amazonaws.com/wf.sharebox/examples/pdf-sample.pdf

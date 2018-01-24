@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot name="ie" driver="internet explorer" close-on-completion="true">
+			<script><![CDATA[
+		
+				pageLoadTimeout(10000)
+				open('https://rpa-tutorial.s3.amazonaws.com/trainings/iframe/iframe-test.html')
+				
+				// Find iframes on top level
+				def numberOfFrames = Integer.parseInt(executeScript("return window.length").toString())
+
+				// Recursive search for all nested iframes
+				def countFrames
+				countFrames = {elements ->
+					int size = elements.size()
+					elements.each {						
+						switchTo().frame(it)
+						frames = $$(byTagName('iframe'))
+						size += countFrames(frames)
+						switchTo().parentFrame()
+					}
+					return size;
+				}
+				
+				def iframeElements = $$(byTagName('iframe'))
+				int totalFrames = countFrames(iframeElements)
+				
+				println("    Number of iframes on the page (top level): ${numberOfFrames}")
+				println("    The total number of iframes (all levels): ${totalFrames}")
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false" />
+</config>

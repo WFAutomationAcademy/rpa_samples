@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+    <selenium-flow>
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="true" start-in-private="false">
+            <script><![CDATA[
+		        import java.util.concurrent.TimeUnit;
+				// {{ get driver and setup
+				ieDriver	= seleniumDriver.getWrappedObject();
+                ieDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES).pageLoadTimeout(1, TimeUnit.MINUTES);
+            	// }} get driver and setup
+            	// get source page
+                ieDriver.get("http://127.0.0.1:4444/grid/console");
+                // get autoit driver nodes list
+                autoitsList	= ieDriver.findElements(By.xpath("//div[@type='browsers']/p/a"));
+                // get browser nodes list
+                browsersList= ieDriver.findElements(By.xpath("//div[@type='browsers']/p/img"));
+                // define var for calc counts
+                def tmp				= "";
+                // IE counts
+                def IENumTotal		= 0;
+                def IENumBusy		= 0;
+                // Chrome counts
+                def ChNumTotal		= 0;
+                def ChNumBusy		= 0;
+                // Autoit counts
+                def autoitNumTotal	= autoitsList.size();
+                def autoitNumBusy	= 0;
+                // calc IE and Chrome total nodes and calc busy nodes
+                for(browser in browsersList) {
+                	tmp = browser.getAttribute("src");
+                	// if it IE add +1 to total count IE
+                	if (tmp.length()>0 && tmp.contains("explorer")) {
+                		IENumTotal++;
+                		// check if IE busy add +1 to count IE busy
+                		tmp = browser.getAttribute("class");
+                		IENumBusy += tmp.equals("busy") ? 1 : 0;
+                	}
+                	// if it Chrome add +1 to total count Chrome
+                	else if (tmp.length()>0 && tmp.contains("chrome")) {
+                		ChNumTotal++;
+                		// check if Chrome busy add +1 to count Chrome busy
+                		tmp = browser.getAttribute("class");
+                		ChNumBusy += tmp.equals("busy") ? 1 : 0;
+                	}
+                }
+                // calc Autoit busy nides
+                for(autoit in autoitsList) {
+                    tmp = autoit.getAttribute("class");
+            		if (tmp.length()>0) busyAutoitNum++;
+                }
+                // define sys vars
+                sys.defineVariable("IENumTotal"		, IENumTotal);
+                sys.defineVariable("IENumBusy"		, IENumBusy);
+                sys.defineVariable("ChNumTotal"		, ChNumTotal);
+                sys.defineVariable("ChNumBusy"		, ChNumBusy);
+                sys.defineVariable("autoitNumTotal"	, autoitNumTotal);
+                sys.defineVariable("autoitNumBusy"	, autoitNumBusy);
+            ]]></script>
+        </selenium>
+    </selenium-flow>
+    
+	<!-- export calc data to output file -->
+    <export include-original-data="true">  
+        <single-column name="autoitNumTotal"	value="${autoitNumTotal.toString()}"/>
+        <single-column name="autoitNumBusy" 	value="${autoitNumBusy.toString()}"/>
+        <single-column name="ChNumTotal" 		value="${ChNumTotal.toString()}"/>
+        <single-column name="ChNumBusy" 		value="${ChNumBusy.toString()}"/>
+        <single-column name="IENumTotal"		value="${IENumTotal.toString()}"/>
+        <single-column name="IENumBusy"			value="${IENumBusy.toString()}"/>
+    </export>
+</config>

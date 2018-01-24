@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+    <selenium-flow>
+        <!-- Internet explorer driver -->
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="false" start-in-private="true">
+            <script><![CDATA[
+            	import java.util.concurrent.TimeUnit;
+            	
+                ieDriver = seleniumDriver.getWrappedObject();
+                ieDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES).pageLoadTimeout(1, TimeUnit.MINUTES);
+                
+                ieDriver.get("https://citi-poc.s3.amazonaws.com/demo-applets/demo/jfc/SwingSet2/custom/SwingSet2.html");
+                
+                TimeUnit.SECONDS.sleep(15);
+            ]]></script>
+        </selenium>
+        <!-- AutoIt driver -->
+        <selenium name="seleniumDriver2" browser="autoit" close-on-completion="true">
+            <script><![CDATA[
+                import java.util.concurrent.TimeUnit;
+                // get autoit driver
+                autoitDriver = seleniumDriver2.getWrappedObject();
+                autoitDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES)
+                // map TimeUnit seconds object
+                tus = TimeUnit.SECONDS;
+                // Switch to the applet window
+                autoitDriver.switchTo().window("[CLASS:SunAwtFrame]");
+                tus.sleep(2);
+				// Click on "JTable demo" button in the applet window.
+                autoitDriver.findElement(By.cssSelector("[CLASS: JToggleButton; TOOLTIP: JTable demo]")).click();
+                // send keys ("text value"+Enter) to the applet table cell with text 'Mike' 
+                autoitDriver.findElement(By.cssSelector("[CLASS: JTable; CELLTEXT:Mike]")).sendKeys(" text value{ENTER}");
+                tus.sleep(1);
+                // send keys ("text value"+Enter) to the applet table cell
+                autoitDriver.findElement(By.cssSelector("[CLASS: JTable; CELL:1,1]")).sendKeys(" text value{ENTER}");
+                tus.sleep(1);
+                // clear text in the applet table cell with text 'Jeff'
+                autoitDriver.findElement(By.cssSelector("[CLASS: JTable; CELLTEXT:Jeff]")).clear();
+                tus.sleep(1);
+                // clear text in the applet table cell 
+                autoitDriver.findElement(By.cssSelector("[CLASS: JTable; CELL:6,0]")).clear();
+                tus.sleep(1);
+                // get text from the applet table cell
+                text = autoitDriver.findElement(By.cssSelector("[CLASS: JTable; CELL:0,0]")).getText();
+                // set text to the applet table cell
+                autoitDriver.findElement(By.cssSelector("[CLASS: JTable; CELL:2,1]")).sendKeys(text);
+                tus.sleep(1);
+            ]]></script>
+        </selenium>
+		<!-- close all windows  -->
+        <selenium name="seleniumDriver" browser="internet explorer" close-on-completion="true">
+        </selenium>
+    </selenium-flow>
+ 
+    <!-- Export values to the output CSV file -->
+    <export include-original-data="false"/>
+</config>

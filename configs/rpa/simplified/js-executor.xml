@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<robotics-flow>
+		<robot driver="chrome" name="web" close-on-completion="true">
+			<script><![CDATA[
+				
+				open("https://rpa-tutorial.s3.amazonaws.com/trainings/dnd/samples/dhtmlxTree/02_checkboxes/05_tree_checkboxes.html")
+				sleep(2000)
+				
+				// selecting a tree element and checking its branch
+				executeScript(
+					"document.querySelector('#treeboxbox_tree table table tr:nth-child(1) > td > span').click();" +
+					"document.querySelector('body > table > tbody > tr:nth-child(1) > td:nth-child(2) > a:nth-child(9)').click();"
+				)
+				sleep(2000)
+				
+				// invoking alert in JS and passing parameters to script
+				def messages = ['Hello ', 'from ']
+				executeScript("alert(arguments[0][0] + arguments[0][1] + arguments[1])", messages, 'JS')
+				sleep(2000)
+				dismiss()
+				
+				// getting a node value using JS
+				element = executeScript("return document.querySelector('body > p').textContent;")
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false">
+		<single-column name="paragraph" value="${element}"/>
+	</export>
+</config>

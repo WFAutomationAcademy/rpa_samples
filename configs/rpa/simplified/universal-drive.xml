@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+
+	<robotics-flow>
+		<robot driver="universal" close-on-completion="true"
+			start-in-private="false">
+			<capability name="SEARCH_ALL_WINDOWS" value="true" />
+			<script><![CDATA[
+						
+				openAndFocus("notepad.exe", 3000, 250);
+				sendKeys("What is RPA?");
+				pressEnter();
+				
+				openFirefox("https://www.wikipedia.org/");
+				$(byXpath("//input[@id='searchInput']")).val("Robotic process automation").pressEnter();
+				
+				def wiki_text = $(byXpath("//div[@id='bodyContent']//p")).getText();
+						
+				window("[CLASS:Notepad]");
+				sendKeys(wiki_text);
+				pressCtrlA();
+				pressBackSpace();
+				
+			]]></script>
+		</robot>
+	</robotics-flow>
+	
+	<export include-original-data="true"></export>
+
+</config>

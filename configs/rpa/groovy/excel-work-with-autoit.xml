@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ set path to Excel template file -->
+	<var-def name="pathToExcelTemplate">
+		<template>c:/WFS_Work/template.xlsx</template>
+	</var-def>
+	<!-- }} set path to Excel template file -->
+	<!-- {{ set path to Excel exe file -->
+	<var-def name="pathToExcel">
+		<template>c:/Program Files/MSOffice/Office16/EXCEL.EXE</template>
+	</var-def>
+	<!-- }} set path to Excel exe file -->	
+ 	<selenium-flow>
+		<selenium name="autoitDriver" browser="autoit" close-on-completion="true">
+			<script><![CDATA[
+				import java.util.concurrent.TimeUnit;
+				import org.openqa.selenium.Keys;
+				import org.openqa.selenium.support.ui.*;
+				
+				TUS = TimeUnit.SECONDS;
+				// get driver object and setup his options
+				aDriver = autoitDriver.getWrappedObject();
+				aDriver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
+				// start Excel with open templates
+				aDriver.get(pathToExcel.toString()+" /r \""+pathToExcelTemplate.toString()+"\"");
+				// pause for view
+				TUS.sleep(5);
+				// change window to table object
+				aDriver.switchTo().window("[CLASS:EXCEL7; INSTANCE:1]");
+				// pause for view
+				TUS.sleep(1);
+				// {{ do 3 right step from current position
+				moveRight = new Actions(aDriver);
+				
+				moveRight.sendKeys(Keys.chord(Keys.ARROW_RIGHT)).perform();
+				moveRight.sendKeys(Keys.chord(Keys.ARROW_RIGHT)).perform();
+				moveRight.sendKeys(Keys.chord(Keys.ARROW_RIGHT)).perform();
+				// }} do 3 right step from current position
+				TUS.sleep(1);
+				// {{ set some text to the current cell
+				addString = new Actions(aDriver);
+				addString.sendKeys("Some text to cell").perform();
+				// }} set some text to the current cell
+				TUS.sleep(1);
+				// {{ do 3 down step from current text
+				moveDown = new Actions(aDriver);
+				
+				moveDown.sendKeys(Keys.chord(Keys.ARROW_DOWN)).perform();
+				moveDown.sendKeys(Keys.chord(Keys.ARROW_DOWN)).perform();
+				moveDown.sendKeys(Keys.chord(Keys.ARROW_DOWN)).perform();
+				// }} do 3 down step from current text
+				TUS.sleep(1);
+				// {{ set some text to the current cell
+				addString = new Actions(aDriver);
+				addString.sendKeys("Some text to lower cell").perform();
+				// }} set some text to the current cell
+				TUS.sleep(1);
+				// {{ send F12 - save as in Excel
+				f12 = new Actions(aDriver);
+				f12.sendKeys(Keys.F12).perform();
+				// }} send F12 - save as in Excel
+				TUS.sleep(1);
+				// {{ switch to save window dialog
+				aDriver.switchTo().window("[CLASS:#32770; TITLE:Save As]");
+				// }} switch to save window dialog
+				TUS.sleep(1);
+				// {{ change the allocated area to the save path field
+				pathField = aDriver.findElement(By.cssSelector("[CLASS:Edit; INSTANCE:1]"));
+				// clear old path data
+				pathField.clear();
+				// click in dialog
+				pathField.click();
+				// set new path to save file
+				pathField.sendKeys(pathToExcelTemplate.toString().replace("/", "\\").replace(".xlsx", "_after_update.xlsx"));
+				// }} change the allocated area to the save path field
+				TUS.sleep(1);
+				// {{ click save button
+				saveButton = aDriver.findElement(By.cssSelector("[CLASS:Button; INSTANCE:8]"));
+				saveButton.click();
+				// }} click save button
+				TUS.sleep(1);
+				// {{ switch back to the table window
+				aDriver.switchTo().window("[CLASS:EXCEL7; INSTANCE:1]");
+				// }} switch back to the table window
+				TUS.sleep(1);
+			]]></script>
+		</selenium>
+	</selenium-flow>
+
+	 <!-- Export values -->
+	 <export include-original-data="false">
+	 </export>
+</config>

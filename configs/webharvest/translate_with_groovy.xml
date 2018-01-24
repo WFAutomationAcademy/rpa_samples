@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{	set paameters for translater -->
+	<var-def name="key">
+       <template>trnsl.1.1.20161206T091821Z.b731600d63edaaf6.ce9aa333ab2d619c8f47c1205a46a3d09edbd528</template>
+    </var-def>
+    <var-def name="text">
+       <template>Hola mi amigo</template>
+    </var-def>
+    <var-def name="hint">
+       <template></template>
+    </var-def>
+    <var-def name="callback">
+       <template></template>
+    </var-def>
+    <var-def name="format">
+       <template>plain</template>
+    </var-def>   
+    <var-def name="options">
+       <template></template>
+    </var-def> 
+     <var-def name="langTo">
+       <template>en</template>
+    </var-def>     
+    <!-- }} set paameters for translater -->
+    
+	<!-- {{ try detect language on current text -->
+	<var-def name="detectLanguage">
+		<json>
+		    <http-extended url="https://translate.yandex.net/api/v1.5/tr.json/detect" method="POST" charset="UTF-8">
+		        <http-param-extended name="key"><template>${key}</template></http-param-extended>
+		        <http-param-extended name="text"><template>${text}</template></http-param-extended>
+		        <http-param-extended name="hint"><template>${hint}</template></http-param-extended>
+		        <http-param-extended name="callback"><template>${callback}</template></http-param-extended>
+		    </http-extended>	
+	    </json>
+    </var-def>
+    <!-- }} try detect language on current text -->
+    
+	<!-- {{ parse recived JSON -->
+    <var-def name="codeJSON">
+        <json expression="$..code">
+            <var name="detectLanguage"/>
+        </json>
+    </var-def>
+    
+    <var-def name="langJSON">
+        <json expression="$..lang">
+            <var name="detectLanguage"/>
+        </json>
+    </var-def>
+    
+	<script><![CDATA[ 
+		sys.defineVariable("code", codeJSON.get(0).getWrappedObject().get(0).toString());
+   		sys.defineVariable("lang", langJSON.get(0).getWrappedObject().get(0).toString().replace("\"", "")+"-"+langTo);
+	]]></script>
+   	<!-- }} parse recived JSON -->
+   	
+	<!-- {{ if we have cood detect language code, try translate text -->
+	<var-def name="translateText">
+		<json>
+			<case>
+				<if condition="${code.toInt()==200}">
+				   <http-extended url="https://translate.yandex.net/api/v1.5/tr.json/translate" method="POST" charset="windows-1252">
+					<http-param-extended name="key"><template>${key}</template></http-param-extended>
+					<http-param-extended name="text"><template>${text}</template></http-param-extended>
+					<http-param-extended name="lang"><template>${lang}</template></http-param-extended>
+					<http-param-extended name="format"><template>${format}</template></http-param-extended>
+					<http-param-extended name="options"><template>${options}</template></http-param-extended>
+					<http-param-extended name="callback"><template>${callback}</template></http-param-extended>    
+				   </http-extended>	
+				</if>
+			</case>
+		</json>
+    </var-def>	
+    <!-- }} if we have cood detect language code, try translate text -->
+   
+	<!-- {{ extract translate text and code -->
+    <var-def name="translatedPhraseJSON">
+        <json expression="$..text">
+            <var name="translateText"/>
+        </json>
+    </var-def>
+      <var-def name="codeTranslateJSON">
+        <json expression="$..code">
+            <var name="translateText"/>
+        </json>
+    </var-def>
+   
+	<script><![CDATA[ 
+		sys.defineVariable("translateCode", codeTranslateJSON.get(0).getWrappedObject().get(0).toString());
+		sys.defineVariable("translatedPhrase", translatedPhraseJSON.get(0).getWrappedObject().get(0).toString().replace("\"", "").replace("[","").replace("]",""));
+    ]]></script>
+	<!-- {{ extract translate text and code -->
+	
+	<!-- export data -->
+	<export include-original-data="true">
+		<single-column name="translateCode" value="${translateCode}" />
+		<single-column name="detectedLang" value="${langTo}" />
+		<single-column name="translatedPhrase" value="${translatedPhrase}" />
+	</export>
+</config>		

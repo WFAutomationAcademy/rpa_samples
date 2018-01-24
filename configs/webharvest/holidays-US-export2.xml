@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<!-- {{ set year for scraping -->
+	<var-def name="scrapYear">
+		<template>2013</template>
+	</var-def>
+	<!-- }} set year for scraping -->
+	
+	<!-- {{ get data from web for scrap year -->
+	<var-def name="holidaysData">
+		<xpath expression="//div[@class='tb-scroll']/table">
+			<html-to-xml prunetags="script,style,head,meta">
+				<http url="http://www.timeanddate.com/holidays/us/${scrapYear.toString()}" charset="UTF-8"></http>
+			</html-to-xml>
+		</xpath>
+	</var-def>
+	<!-- }} get data from web for scrap year -->
+	
+	<!-- {{ fields name list from holidays table -->
+	<var-def name="header">
+		<xpath expression="//table/thead/tr[1]/*/text()">
+			<var name="holidaysData"/>
+		</xpath>	
+	</var-def>
+	<!-- }} fields name list from holidays table -->
+	
+	<!-- rows from holidays table -->
+	<var-def name="cells">
+		<regexp replace="true">
+		    <regexp-pattern><![CDATA[ (<[^>]*>|\n) ]]></regexp-pattern>
+		    <regexp-source>				
+				<xpath expression="//table/tbody/tr/*">
+					<var name="holidaysData"/>
+				</xpath>
+		    </regexp-source>
+		    <regexp-result>
+		        <template></template>
+		    </regexp-result>
+		</regexp>	
+	</var-def>
+	
+	<!-- {{ loop by rows and get data -->	
+	<script><![CDATA[  
+		import com.google.gson.Gson;  
+			
+		Gson gson = new Gson();       			
+		List resultList = new ArrayList();
+		Map nestedMap = new HashMap();
+		        
+		println header.toList()
+		println cells.toList().size()
+		cells.eachWithIndex { cell, idx ->
+			nestedMap[header[idx % header.size()].toString()] = cell.toString().trim()
+			if (nestedMap.size() >= header.size()) {
+				resultList.add(nestedMap)
+				nestedMap = new HashMap()
+			}
+		}  
+		sys.defineVariable("resultList", resultList, true); 
+	]]></script> 
+	<!-- }} loop by rows and get data -->
+	
+    <export include-original-data="true">
+    	<multi-column list="${resultList.getWrappedObject()}" split-results="true">
+    		<loop item="columnName">
+                <list>
+                    <var name="header"/>
+                </list>
+                <body>
+                    <put-to-column-getter name="${columnName}" property="${columnName}" />
+                </body>
+            </loop>
+        </multi-column>
+    </export>
+</config>

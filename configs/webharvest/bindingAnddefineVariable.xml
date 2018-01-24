@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+  	<script><![CDATA[      
+        sys.defineVariable("emplr_name"			, "two"		, true);
+        sys.defineVariable("verification_url"	, "three"	, true);
+             
+        class SimpleClass {
+            public String superMethod() {
+                return "myOwnValue";
+            }
+        }
+        
+		SimpleClass simpleObject = new SimpleClass();
+		
+		binding.putAt("classViaBinding", simpleObject);
+		
+		sys.defineVariable ("classViaSys", simpleObject, true);
+    ]]></script>
+       
+    <log message="********************* from WebHarvest: ${verification_url}" level="INFO"/>
+
+    <script><![CDATA[      
+        System.out.println("********************* String via sys WH object: " + emplr_name); 
+        System.out.println("********************* class via sys WH object: " + classViaSys.getWrappedObject().superMethod());   
+        System.out.println("********************* class via binding: " + classViaBinding.superMethod());    
+    ]]></script> 
+
+    <export include-original-data="true"></export>
+
+</config>

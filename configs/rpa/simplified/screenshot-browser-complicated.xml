@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+	<robotics-flow>
+		<robot driver="internet explorer" close-on-completion="true" maximize-on-startup="false" name="webDriver">
+			<script><![CDATA[
+				import org.apache.commons.io.FileUtils
+				timeouts(15 * 1000)
+				
+				open('https://www.w3.org/')
+				screen = ((TakesScreenshot) driver()).getScreenshotAs(OutputType.FILE)
+				screenshot = new File('screenshot' + UUID.randomUUID() + '.png')
+				FileUtils.copyFile(screen, screenshot)
+
+				println('==========================================' + screenshot.getAbsolutePath())
+				sleep(2000)
+			]]></script>
+		</robot>
+	</robotics-flow>
+	
+	<var-def name="content">
+		<script return="bytes"><![CDATA[
+			import org.apache.commons.io.FileUtils
+			bytes = FileUtils.readFileToByteArray(screenshot)
+			FileUtils.forceDelete(screenshot)
+			FileUtils.forceDelete(screen)
+			
+		]]></script>
+	</var-def>
+	
+	<var-def name="link_url">
+		<s3 bucket='temp.bucket'>
+			<s3-put path="_r2d2/${screenshot.getName()}" content-type="image/png">
+				<var name="content" />
+			</s3-put>
+		</s3>
+	</var-def>
+	
+	<export include-original-data="true">
+		<single-column name="link_url" value="${link_url}" />
+	</export>
+
+</config>

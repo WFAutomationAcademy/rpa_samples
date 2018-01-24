@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+	<var-def name="excelFile">
+		<excel-to-list>
+			<file path="C:/WFS_Work/investigations.xlsx" action="read" type="binary"></file>
+		</excel-to-list>
+	</var-def>
+	<!-- {{ loop by rows from Excel -->
+	<loop item="row" index="rowIdx">
+		<list>
+			<var name="excelFile"/>
+		</list>
+		<body>
+			<!-- define vae for row information -->
+			<var-def name="rowInfo"/>
+			<!-- {{ loop by fields in row -->
+			<loop item="field" index="idxf">
+				<list>
+					<xpath expression="//row/*">
+		            	<var name="row"/>
+			        </xpath>
+				</list>
+				<body>
+					<!-- {{ get field name -->
+					<var-def name="field_name">
+						<xpath expression="//name()">
+			            	<var name="field"/>
+				        </xpath>
+					</var-def>
+					<!-- }} get field name -->
+					<!-- {{ get field data -->
+					<var-def name="field_text">
+						<xpath expression="//text()">
+			            	<var name="field"/>
+				        </xpath>
+					</var-def>
+					<!-- }} get field data -->
+					<var-def name="rowInfo">
+						<template>
+							${rowInfo.toString()} / ${field_name} = ${field_text}
+						</template>
+					</var-def>
+				</body>
+			</loop> 
+			<!-- }} loop by fields in row -->
+			<log message="${rowInfo}" level="ERROR"/>    
+        </body>
+	</loop>
+	<!-- }} loop by rows from Excel -->
+	<export include-original-data="true">
+	</export>  
+</config>

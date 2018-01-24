@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+ 
+    <robotics-flow>
+        <robot name="bb8" driver="desktop" close-on-completion="true">
+        	<capability name="SEARCH_ALL_WINDOWS" value="true" />
+            <script> <![CDATA[
+            	
+            	import java.util.concurrent.TimeUnit
+                timeouts().implicitlyWait(5, TimeUnit.SECONDS)
+                rpaVariables = new HashMap()
+                
+                open('calc1.exe')
+                switchTo().window('[CLASS:CalcFrame]')
+               
+                ['2*4*8*16=', '5*5=', '10/2='].each {
+                    
+                    sample = it.toString()
+                    
+                    sendKeys(Keys.DELETE)
+                    sendKeys(sample)
+                    
+                    result = selectAllTextAndCopy()
+                    rpaVariables.put(sample, result)
+                }
+                
+            ]]></script>
+        </robot>
+    </robotics-flow>
+    
+    <export include-original-data="false">
+        <loop item="rpaVar">
+            <list>
+                <script return="keys">
+                    keys = new ArrayList(rpaVariables.keySet())
+                </script>
+            </list>
+            <body>
+                <single-column name="${rpaVar}">
+                    <template>${rpaVariables.get(rpaVar.toString())}</template>
+                </single-column>
+            </body>
+        </loop>
+    </export>
+</config>

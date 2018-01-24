@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+
+	<robotics-flow>
+		<robot driver="universal" close-on-completion="true"
+			start-in-private="false">
+			<capability name="SEARCH_ALL_WINDOWS" value="true" />
+			<script><![CDATA[
+				def s3Path = "https://pub_demo.s3.amazonaws.com/trainings/Tickers.xlsx"
+				def filePath = downloadFileOnAgent(s3Path)
+				def newFilePath = System.getProperty("java.io.tmpdir") + "copied-excel.xlsx"
+				sys.defineVariable("path", newFilePath)
+
+				openExcel(filePath)
+				switchSheet(filePath, "Fact")
+				
+				if (getActiveCell(filePath) != 'A1') {
+					setActiveCell(filePath, ExcelCellPosition.START_OF_DOCUMENT)
+				}
+				
+				// Getting Row and Column values
+				
+				def firstColumn = getColumn(filePath, 'A', 2, 5)
+				def secondRow = getRow(filePath, ExcelColumnRowPosition.CURRENT)
+				
+				// Searching for a cell with a particular value
+				
+				def temp = getCell(filePath, 'B1')
+				int counter = 0
+				int maxRowsCount = 100
+				while (temp != 'Schlumberger Limited' && counter < maxRowsCount) {
+					temp = getCell(filePath, ExcelCellPosition.CELL_BELOW)
+					counter++
+				}
+				def price = getCell(filePath, ExcelCellPosition.CELL_TO_THE_RIGHT)
+				deleteCell(filePath, ExcelCellPosition.CURRENT)
+				
+				// Copying a range between sheets
+				
+				def tempRange = getRange(filePath, 'A4')
+				switchSheet(filePath, 1)
+				setRange(filePath, 'A4', tempRange)
+				
+				// Saving as new file and closing file
+				
+				saveExcel(filePath, newFilePath)
+				closeExcel(filePath)
+
+				sys.defineVariable("firstColumn", firstColumn)
+				sys.defineVariable("secondRow", secondRow)
+				sys.defineVariable("price", price)
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="true">
+		<single-column name="firstColumn" value="${firstColumn}"/>
+		<single-column name="secondRow" value="${secondRow}"/>
+		<single-column name="price" value="${price}"/>
+	</export>
+</config>

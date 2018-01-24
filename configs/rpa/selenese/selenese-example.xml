@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config">
+    <selenium-flow>
+      <selenium name="seleniumDriver" browser="chrome" close-on-completion="true" start-in-private="true">
+        <selenese>
+        <![CDATA[
+			<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+			<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+			<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+			<link rel="selenium.base" href="http://google.com/" />
+			<title>google.com/title>
+			</head>
+			<body>
+			<table border="1" cellpadding="1" cellspacing="1">
+			<thead>
+			<tr><td rowspan="1" colspan="3">google.com</td></tr>
+			</thead><tbody>
+			<tr>
+				<td>storeEval</td>
+				<td>storedVars['linksArray'] = [];</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>open</td>
+				<td>https://www.google.by/#q=workfusion</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>pause</td>
+				<td>3000</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>storeEval</td>
+				<td>var links = window.document.querySelectorAll('h3 a'); var linksArray = []; for (var i = 0; i &lt; links.length; i++) { linksArray.push(links[i].href); } storedVars['linksArray'] = linksArray; storedVars['linkIndex'] = 0; storedVars['linksSize'] = linksArray.length;</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>storeEval</td>
+				<td>var al = window.open('', 'Results'); al.document.write("<!DOCTYPE html><html><header></header><body><h1>Result links total: "+ ${linksSize} + "</h1></body></html>");</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>pause</td>
+				<td>5000</td>
+				<td></td>
+			</tr>
+			</tbody></table>
+			</body></html>
+        ]]></selenese>
+      </selenium>
+    </selenium-flow>
+	
+    <export include-original-data="true"></export>
+</config>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+
+	<robotics-flow>
+		<robot driver="internet explorer">
+			<script><![CDATA[
+				open('https://rpa-tutorial.s3.amazonaws.com/trainings/table-automation.html')
+				
+				def colHeading = 'Licensing'
+				def columnValues = []
+				def tBodyXpath = "//*[@id='main']/div[2]/div/div[2]/table/tbody"
+				def totalRows = $$(byXpath("${tBodyXpath}/tr")).size()
+				
+				for(int i=1;i<=3;i++) {
+	
+					def hValue = $(byXpath("${tBodyXpath}/tr[1]/th[${i}]")).getText()
+					
+					if(hValue.equalsIgnoreCase(colHeading)) {
+						// If the sValue match with the description, it will initiate one more inner loop for all the columns of 'i' row
+						for(int j=2; j<=totalRows; j++){
+							def tempVal = $(byXpath("${tBodyXpath}/tr[${j}]/td[${i}]")).getText()
+							columnValues.add(tempVal) 
+						}
+						break
+					}
+				}
+				log.warn(columnValues.toString())
+				
+				//==========================================
+				
+				def sRow = 1
+				def sCol = 2
+				def sColumnValue = []
+
+				//Here we are locating the xpath by passing variables in the xpath
+				def sCellValue = $(byXpath(".//*[@id='content']/table/tbody/tr[" + sRow + "]/td[" + sCol + "]")).getText()
+				println(sCellValue)
+				def sRowValue = 'Clock Tower Hotel'
+
+				//First loop will find the 'ClOCK TOWER HOTEL' in the first column
+				for (int i=1; i<=5; i++) {
+					def sValue = null
+					sValue = $(byXpath(".//*[@id='content']/table/tbody/tr[" + i + "]/th")).getText()
+					if(sValue.equalsIgnoreCase(sRowValue)){
+						// If the sValue match with the description, it will initiate one more inner loop for all the columns of 'i' row
+						for (int j=1; j<=5; j++){
+							def temp = $(byXpath(".//*[@id='content']/table/tbody/tr[" + i + "]/td["+ j +"]")).getText()
+							sColumnValue.add(temp)
+						}
+						break
+					}
+				}
+				log.warn(sColumnValue.toString())
+			
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="true"/>
+</config>

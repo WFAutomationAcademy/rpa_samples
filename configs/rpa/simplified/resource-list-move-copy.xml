@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+    <robotics-flow>
+        <robot driver="desktop" close-on-completion="true" name="desktopDriver">
+            <script><![CDATA[
+            	import com.workfusion.rpa.helpers.resources.Filter
+            	import java.time.temporal.ChronoUnit
+            	
+            	def sourceFolder = 'D:\\_temp\\configs\\'
+            	def destinationFolder = 'D:\\_temp\\txt\\'
+            	
+            	
+            	// Getting all files and folders recursively and exporting as a list
+            	
+                def filterAll = Filter.filesAndFolders().includeSubFolders().get()
+				def allFolderFiles = Resource.listFolder(sourceFolder, filterAll)
+				sys.defineVariable("allFolderFiles", allFolderFiles)
+				
+				
+				// Getting all TXT files recursively and copying them to destination folder
+				
+				def filterByExtension = Filter.files().includeSubFolders().pattern('.*.txt').get()
+				def onlyTxtFiles = Resource.listFolder(sourceFolder, filterByExtension)
+				onlyTxtFiles.each { filename ->
+    				Resource.copyOverwrite(filename, destinationFolder)
+				};
+				
+				
+				// Getting all folders changed in the last 5 days and moving them to destination folder
+				
+				def filterByDate = Filter.folders()
+                                         .includeSubFolders()
+                                         .modifiedInLast(Integer.valueOf("5"), ChronoUnit.DAYS)
+                                         .get()
+				def onlyNewFolders = Resource.listFolder(sourceFolder, filterByDate)
+				onlyNewFolders.each { foldername ->
+    				Resource.moveSkip(foldername, destinationFolder)
+				};
+             ]]></script>
+        </robot>
+    </robotics-flow>
+     
+    <export include-original-data="true">
+    	<multi-column list="${allFolderFiles}" split-results="true">
+    		<put-to-column name="paths"/>
+    	</multi-column>
+    </export>
+
+</config>

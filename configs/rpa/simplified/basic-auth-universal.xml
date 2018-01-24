@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+
+	<robotics-flow>
+		<robot driver="universal" close-on-completion="true" start-in-private="true">
+			<capability name="SEARCH_ALL_WINDOWS" value="true" />
+			<script><![CDATA[
+				timeouts(40 * 1000)
+				enableTypeOnScreen()
+				
+				openIE('http://browserspy.dk/password.php')
+               	$(byLinkText('password-ok.php')).click()
+               	
+              	window("[TITLE:Windows Security]")
+                sendKeys('test')
+                pressTab()
+                sendKeys('test')
+                pressEnter()
+       
+			]]></script>
+		</robot>
+	</robotics-flow>
+	
+	<export include-original-data="false"/>   
+</config>

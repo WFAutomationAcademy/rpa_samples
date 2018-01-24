@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+    <robotics-flow>
+        <robot driver="desktop" close-on-completion="true" name="desktopDriver">
+            <script><![CDATA[
+
+                def s3Path = 'https://pub_demo.s3.amazonaws.com/trainings/new.txt';
+                def newDir = System.getProperty("java.io.tmpdir")+ "new_dir";
+                def filePath = downloadFileOnAgent(s3Path);
+                def newFileName = newDir + UUID.randomUUID() + '.txt';
+                def now = new Date().format( 'yyyyMMdd:hh:mm:ss');
+
+                is_existing = Resource.exist(filePath);
+                
+                if (is_existing) {
+                	Resource.append(filePath, '___ New Content ___', 'utf-8');
+                	content_utf8 = Resource.read(filePath, 'utf-8');
+                	Resource.delete(filePath);
+                }
+                
+     			Resource.createDirectoryOverwrite(newDir);
+                Resource.createFileSkip(newFileName);
+                Resource.overwrite(newFileName, "File overwritten at ${now}", 'utf-8');
+                
+             ]]></script>
+        </robot>
+    </robotics-flow>
+    
+    <export include-original-data="true">
+    	<single-column name="existing_file" value="${is_existing}"/>
+    	<single-column name="content_utf8" value="${content_utf8}"/>
+    </export>
+
+</config>

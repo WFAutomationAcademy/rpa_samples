@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+    <robotics-flow>
+        <robot name="desktopDriver" driver="desktop" close-on-completion="true">
+            <script><![CDATA[
+            	String downloadLink = "https://pub_demo.s3.amazonaws.com/trainings/new.txt";
+                String filePath = System.getProperty("java.io.tmpdir") + "test.txt";
+                String filePathOnAgent = downloadFileOnAgent(downloadLink, filePath);
+            
+            
+                open("notepad.exe");
+                switchTo().window("[CLASS:Notepad]");
+                sendKeys("foo");
+
+                // select all and copy
+                pressCtrlA();
+                pressCtrlC();
+                sys.defineVariable("clipboard", clipboardText());
+
+                // paste
+                sendKeys(Keys.HOME);
+                pressCtrlV();
+
+                // select all and copy
+                sys.defineVariable("entire_text", selectAllTextAndCopy());
+                
+                // undo - redo
+                pressCtrlZ();
+                pressCtrlShiftZ();
+                
+                // open file downloaded from s3
+                sendKeys(Keys.chord(Keys.CONTROL, "o"));
+                
+                // select "Do not save" option
+                switchTo().window("[TITLE:Notepad]");
+                $("[CLASS:Button; INSTANCE:2]").click();
+                
+                switchTo().window("[TITLE:Open]");
+                sendKeys(filePathOnAgent);
+                pressEnter();
+                
+                switchTo().window("[CLASS:Notepad]");
+                sys.defineVariable("downloaded_text", selectAllTextAndCopy());
+                sleep(3000);
+                
+             ]]>
+            </script>
+        </robot>
+    </robotics-flow>
+
+    <export include-original-data="false">
+    	<single-column name="clipboard" value="${clipboard}"/>
+    	<single-column name="entire_text" value="${entire_text}"/>
+    	<single-column name="downloaded_text" value="${downloaded_text}"/>
+    </export>
+
+</config>

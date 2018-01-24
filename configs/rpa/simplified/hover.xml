@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config"
+	scriptlang="groovy">
+
+	<robotics-flow>
+		<robot name="r2d2" driver="internet explorer"
+			close-on-completion="true">
+			<script><![CDATA[
+				timeouts(40 * 1000)
+				open('https://rpa-tutorial.s3.amazonaws.com/trainings/dnd/samples/dhtmlxMenu/04_items/08_change_items_images.html')
+
+				$$('.top_level_text').get(0).hover()
+				$(byText('Open')).click()
+				$(byXpath('//*[@id="imgList"]/span[7]/img')).click()
+
+				sleep(2000)
+
+				$$('.top_level_text').get(1).hover()
+				$(byText('Select All')).click()
+				$('input').click()
+
+				sleep(2000)
+
+				$$('.top_level_text').each { item ->
+					item.hover()
+					sleep(2000)
+				}
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="false" />
+</config>

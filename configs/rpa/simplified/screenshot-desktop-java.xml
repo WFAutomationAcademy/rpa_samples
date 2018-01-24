@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+	<var-def name="javaScreenshot"><![CDATA[
+		import java.awt.Robot;
+		import java.awt.Rectangle;
+		import java.awt.image.BufferedImage;
+		import javax.imageio.ImageIO;
+		import java.io.File;
+		import org.openqa.selenium.Point;
+		import org.openqa.selenium.Dimension;
+		Point pos = driver.manage().window().getPosition();
+		Dimension dim = driver.manage().window().getSize();
+		BufferedImage screenFullImage = new Robot().createScreenCapture(new Rectangle(pos.x, pos.x, dim.width, dim.height));
+		File file = new File(System.getProperty("java.io.tmpdir") + "screenshot_${System.currentTimeMillis()}.png");
+		ImageIO.write(screenFullImage, "png", file);
+		return file.getAbsolutePath();
+	]]></var-def>
+
+	<robotics-flow>
+		<robot driver="desktop">
+			<script><![CDATA[
+				open("notepad.exe");
+				switchTo().window("[CLASS:Notepad]");
+				String path = executeGroovyScript(javaScreenshot.toString());
+				log.warn("file path : ${path}");
+				sys.defineVariable("path", path)
+			]]></script>
+		</robot>
+	</robotics-flow>
+	<export include-original-data="true">
+		<single-column name="path" value="${path}"/>
+	</export>
+</config>

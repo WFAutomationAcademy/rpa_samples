@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+ 
+    <robotics-flow>
+        <robot name="bb8" driver="desktop" close-on-completion="true">
+        	<capability name="SEARCH_ALL_WINDOWS" value="true" />
+            <script> <![CDATA[
+                      		
+            	def appletUrl = 'https://rpa-tutorial.s3.amazonaws.com/demo/jfc/SwingSet2/SwingSet2.jar'
+                timeouts(40 * 1000)
+ 
+                def localPath = downloadFileOnAgent(appletUrl)
+                open("java -jar ${localPath}")
+                
+                switchTo().window('[CLASS:SunAwtFrame; TITLE:SwingSet2]')
+                
+                $('[CLASS: JToggleButton; TOOLTIP: JTable demo]').click()
+                
+                // Change some values inside table.
+                cell = $('[CLASS: JTable; CELLTEXT:Mike]').val("new value")
+                sleep(500)
+                $('[CLASS: JTable; CELL:1,1]').sendKeys(" append{ENTER}")
+                sleep(500)
+                
+                // Clear cell values
+                $('[CLASS: JTable; CELLTEXT:Jeff]').clear()
+                sleep(500)
+                $('[CLASS: JTable; CELL:6,0]').clear()
+                sleep(500)
+                
+                // Work with text.
+                def text = $('[CLASS: JTable; CELL:0,0]').getText()
+                $('[CLASS: JTable; CELL:2,1]').sendKeys(text)
+                sleep(3000)
+                
+            ]]></script>
+        </robot>
+    </robotics-flow> 
+    <export include-original-data="false"/>
+</config>
