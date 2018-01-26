@@ -13,7 +13,7 @@ Directory | Description | Business process(BP) analogue |
 
 # Samples
 
-* [configs/webharvest/bindingAndDefineVariable.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/bindingAnddefineVariable.xml) -
+* [configs/webharvest/bindingAndDefineVariable.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/bindingAndDefineVariable.xml) -
     How to access `java/groovy` variable with web-harvest command.
 * [configs/webharvest/create-file-s3put.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/create-file-s3put.xml) -
     Creating plain text file and uploading it to S3.
