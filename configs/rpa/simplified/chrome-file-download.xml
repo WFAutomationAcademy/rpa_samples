@@ -3,7 +3,11 @@
 
 	<script><![CDATA[
 		// Set your download directory here
-		downloadDir = System.getProperty("java.io.tmpdir")
+		downloadDir = System.getProperty("user.home")
+		if (! downloadDir.endsWith(File.separator)) {
+			downloadDir += File.separator
+		}
+		downloadDir += "Downloads" + File.separator
 		
 		getLastModifiedFileName = {RemoteWebDriver aDriver, String dirPath ->
 			return (String) aDriver.executeScript(
@@ -25,37 +29,44 @@
 
 			byte[] content = Base64.getDecoder().decode(res.toString());
 			return content;
+		}		
+		
+		isDownloading = { String downloadFilePath ->
+			tempFile = new File(downloadFilePath + ".crdownload");			
+			String fileExtension = org.apache.commons.io.FilenameUtils.getExtension(downloadFilePath);
+			return tempFile.exists() || "crdownload".equals(fileExtension) || "tmp".equals(fileExtension);
 		}
 
 		getDownloadedFile = {RemoteWebDriver desktopDriver, String downloadDir, String latestFilePath ->
 			String downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
 
 			// Wait until new file appears.
-			int maxCounter = 1000;
+			int maxCounter = 100;
 			boolean downloadStarted = downloadFilePath != null && !downloadFilePath.equals(latestFilePath);
 			while (!downloadStarted && maxCounter > 0) {
-				Thread.sleep(10);
+				Thread.sleep(100);
 				downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
-				downloadStarted = downloadFilePath != null && !downloadFilePath.equals(latestFilePath);
+				downloadStarted = downloadFilePath != null && downloadFilePath.replace('\\', '/').equals(latestFilePath.replace('\\', '/'));
 				maxCounter--;
 			}
 
 			// Lets wait until latest file is not tmp or crdownload.
 			if (downloadStarted) {
+				Thread.sleep(1000);
 				maxCounter = 300;
 				downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
+				tempFile = new File(downloadFilePath + ".crdownload");
 				String fileExtension = org.apache.commons.io.FilenameUtils.getExtension(downloadFilePath);
-				boolean isDownloading = "crdownload".equals(fileExtension) || "tmp".equals(fileExtension);
 
-				while (isDownloading && maxCounter > 0) {
+				while (isDownloading(downloadFilePath) && maxCounter > 0) {
 					Thread.sleep(100);
 					downloadFilePath = getLastModifiedFileName(desktopDriver, downloadDir);
 					fileExtension = org.apache.commons.io.FilenameUtils.getExtension(downloadFilePath);
-					isDownloading = "crdownload".equals(fileExtension) || "tmp".equals(fileExtension);
 
 					maxCounter--;
 				}
-				if (!isDownloading) {
+				if (!isDownloading(downloadFilePath)) {
+					sys.defineVariable("downloadFilePath", downloadFilePath)
 					return getFileContent(desktopDriver, downloadFilePath);
 				}
 			}
@@ -95,7 +106,7 @@
 
 	<!-- Export your values -->
 	<export include-original-data="true">
-		<single-column name="content" value="${documentContent}"></single-column>
+		<single-column name="downloadFilePath" value="${downloadFilePath}"></single-column>
 	</export>
 
 </config>

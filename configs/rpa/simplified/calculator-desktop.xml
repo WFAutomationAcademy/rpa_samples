@@ -10,7 +10,9 @@
                 timeouts().implicitlyWait(5, TimeUnit.SECONDS)
                 rpaVariables = new HashMap()
                 
-                open('calc1.exe')
+				// You should download and install old calc application and call calc1.exe
+				// 		if you run it on Windows 10.
+                open('calc.exe')
                 switchTo().window('[CLASS:CalcFrame]')
                
                 ['2*4*8*16=', '5*5=', '10/2='].each {

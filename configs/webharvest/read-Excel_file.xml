@@ -3,7 +3,7 @@
 <config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
 	<var-def name="excelFile">
 		<excel-to-list>
-			<file path="C:/WFS_Work/investigations.xlsx" action="read" type="binary"></file>
+			<file path="file path goes here.xlsx" action="read" type="binary"></file>
 		</excel-to-list>
 	</var-def>
 	<!-- {{ loop by rows from Excel -->

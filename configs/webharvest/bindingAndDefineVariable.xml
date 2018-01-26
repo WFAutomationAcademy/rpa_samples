@@ -2,8 +2,8 @@
 <config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
 
   	<script><![CDATA[      
-        sys.defineVariable("emplr_name"			, "two"		, true);
-        sys.defineVariable("verification_url"	, "three"	, true);
+        sys.defineVariable("emplr_name", "two", true);
+        sys.defineVariable("verification_url", "three", true);
              
         class SimpleClass {
             public String superMethod() {
@@ -11,11 +11,11 @@
             }
         }
         
-		SimpleClass simpleObject = new SimpleClass();
-		
-		binding.putAt("classViaBinding", simpleObject);
-		
-		sys.defineVariable ("classViaSys", simpleObject, true);
+        SimpleClass simpleObject = new SimpleClass();
+
+        binding.putAt("classViaBinding", simpleObject);
+
+        sys.defineVariable ("classViaSys", simpleObject, true);
     ]]></script>
        
     <log message="********************* from WebHarvest: ${verification_url}" level="INFO"/>
