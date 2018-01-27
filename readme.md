@@ -13,6 +13,8 @@ Directory | Description | Business process(BP) analogue |
 
 # Samples
 
+## [configs/webharvest](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/webharvest) - Samples of webharvest library using
+
 * [configs/webharvest/bindingAndDefineVariable.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/bindingAndDefineVariable.xml) -
     How to access `java/groovy` variable with web-harvest command.
 * [configs/webharvest/create-file-s3put.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/create-file-s3put.xml) -
@@ -43,7 +45,8 @@ Directory | Description | Business process(BP) analogue |
     Creating folder and subfolders/files in it. This sample teaches you how to call
     functions recursively.
 * [configs/webharvest/set-flag.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/set-flag.xml) -
-    Updating field in datastore. *Note*: csv file won't change.
+    Updating field in datastore. *Note*: csv file in datastore folder won't change
+    during execution in WF studio.
 * [configs/webharvest/split_text_by_webharvest.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/split_text_by_webharvest.xml) -
     Splitting text with [```<split>```](https://kb.workfusion.com/display/WF/split) command.
 * [configs/webharvest/test-ds.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/test-ds.xml) -
@@ -53,3 +56,15 @@ Directory | Description | Business process(BP) analogue |
     for first assignment, you should use [MS API](https://www.microsoft.com/en-us/translator/translatorapi.aspx) there.
 * [configs/webharvest/validate-url.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/validate-url.xml) -
     Checking site status with [```<url-validator>```](https://kb.workfusion.com/display/WF/url-validator).
+
+## [configs/rpa](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/rpa) - Samples of RPA automation.
+### [configs/rpa/selenese]() - .
+### [configs/rpa/simplified]() - .
+### [configs/rpa/starter_sample]() - .
+### [configs/rpa/webharvest]() - .
+
+* []() -
+* []() -
+* []() -
+* []() -
+* []() -
