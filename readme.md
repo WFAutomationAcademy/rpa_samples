@@ -58,13 +58,19 @@ Directory | Description | Business process(BP) analogue |
     Checking site status with [```<url-validator>```](https://kb.workfusion.com/display/WF/url-validator).
 
 ## [configs/rpa](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/rpa) - Samples of RPA automation.
-### [configs/rpa/selenese]() - .
-### [configs/rpa/simplified]() - .
-### [configs/rpa/starter_sample]() - .
-### [configs/rpa/webharvest]() - .
 
-* []() -
-* []() -
-* []() -
-* []() -
-* []() -
+### [configs/rpa/selenese](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/rpa/selenese) -  Using [```<selenese>```](https://kb.workfusion.com/display/RPA/%5B8.2%5D+-+Selenium+Plugins#id-[8.2]-SeleniumPlugins-capability) command.
+
+* [configs/rpa/selenese/selenese-example.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/selenese/selenese-example.xml) -
+    Searching in web by Google search engine.
+
+### [configs/rpa/simplified]() - Samples of [simplified](https://kb.workfusion.com/display/RPA/Simplified+Robotics+API) syntax.
+
+### [configs/rpa/starter_sample](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/rpa/starter_sample) - The sample you can start your own automation with.
+
+* [configs/rpa/starter_sample/rpa-starter-sample.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/starter_sample/rpa-starter-sample.xml).
+
+### [configs/rpa/webharvest](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/rpa/webharvest) - Mixing Selenium and Webhervest to parse html-page.
+
+* [configs/rpa/webharvest/page-source.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/webharvest/page-source.xml) - Scrapping web-table content.
+
