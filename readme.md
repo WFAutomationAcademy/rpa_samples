@@ -2,6 +2,13 @@
 
 Samples for RPA courses on [AutomationAcademy.com](https://automationacademy.com/learn/my/).
 
+# Installation
+
+You should have account on [WorkFusion Knowledge Base](https://kb.workfusion.com/display/START/WorkFusion+Knowledge+Base) to access these links.
+* [WF Studio instalation](https://kb.workfusion.com/display/WF/Installation+and+Update)
+* [RPA installation](https://kb.workfusion.com/display/RPA/RPA+Environment+Setup)
+
+
 # Project structure
 
 Directory | Description | Business process(BP) analogue |
