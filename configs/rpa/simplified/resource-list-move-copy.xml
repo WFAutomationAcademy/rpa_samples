@@ -7,8 +7,8 @@
             	import com.workfusion.rpa.helpers.resources.Filter
             	import java.time.temporal.ChronoUnit
             	
-            	def sourceFolder = 'D:\\_temp\\configs\\'
-            	def destinationFolder = 'D:\\_temp\\txt\\'
+            	def sourceFolder = source folder goes here
+            	def destinationFolder = destination folder goes here
             	
             	
             	// Getting all files and folders recursively and exporting as a list

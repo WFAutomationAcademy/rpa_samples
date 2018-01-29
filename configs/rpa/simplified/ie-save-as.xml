@@ -35,7 +35,7 @@
 
 				sleep(1000)
 				// saving file content to a byte array
-				file_content = downloadFileFromAgent(savePath)
+				file_content = downloadFileFromAgent(savePath + ".js")
 			]]></script>
 		</robot>
 		

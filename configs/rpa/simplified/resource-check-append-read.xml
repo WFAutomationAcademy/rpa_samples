@@ -6,7 +6,7 @@
             <script><![CDATA[
 
                 def s3Path = 'https://pub_demo.s3.amazonaws.com/trainings/new.txt';
-                def newDir = System.getProperty("java.io.tmpdir")+ "new_dir";
+                def newDir = System.getProperty("java.io.tmpdir") + "new_dir";
                 def filePath = downloadFileOnAgent(s3Path);
                 def newFileName = newDir + UUID.randomUUID() + '.txt';
                 def now = new Date().format( 'yyyyMMdd:hh:mm:ss');
