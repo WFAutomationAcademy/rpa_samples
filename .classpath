@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="WF_LIBS_SUPPORT"/>
+	<classpathentry kind="src" path=".metadata"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT">
+		<attributes>
+			<attribute name="minimal" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
