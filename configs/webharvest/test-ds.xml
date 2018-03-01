@@ -14,8 +14,8 @@
 
 
 	<var-def name="outputLink">
-		<s3 bucket="vr1677">
-			<s3-put path="aharhots/my_super_file.csv" acl="PublicRead"
+		<s3 bucket="wf-vr-training">
+			<s3-put path="temp.bucket/my_super_file.csv" acl="PublicRead"
 				content-type="text/csv; charset=utf-8" content-disposition="inline">
 				<list-to-csv>
 					<json expression="$.row">

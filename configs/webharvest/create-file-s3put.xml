@@ -15,8 +15,8 @@
     ]]></script>
  
     <var-def name="fileS3Location">
-        <s3 bucket="temp.bucket">
-            <s3-put path="my-super-file.txt"  content-type="text/plain" content-disposition="inline" acl="PublicRead">
+        <s3 bucket="wf-vr-training">
+            <s3-put path="temp.bucket/my-super-file.txt"  content-type="text/plain" content-disposition="inline" acl="PublicRead">
             	<var name="fileBytes"/>
             </s3-put>
         </s3>
