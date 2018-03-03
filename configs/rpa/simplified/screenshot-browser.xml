@@ -15,8 +15,8 @@
 	</robotics-flow>
 	
 	<var-def name="link_url">
-		<s3 bucket='temp.bucket'>
-			<s3-put path="_r2d2/${'screenshot' + UUID.randomUUID() + '.png'}" acl="PublicRead" content-type="image/png">
+		<s3 bucket='wf-vr-training'>
+			<s3-put path="temp.bucket/_r2d2/${'screenshot' + UUID.randomUUID() + '.png'}" acl="PublicRead" content-type="image/png">
 				<script return="screen"/>
 			</s3-put>
 		</s3>

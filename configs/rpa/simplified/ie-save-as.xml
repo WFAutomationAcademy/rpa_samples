@@ -45,8 +45,8 @@
 
 	<!-- creating a file on S3 storage -->
 	<var-def name="file_s3_location">
-		<s3 bucket="temp.bucket">
-			<s3-put path="_r2d2/${uniqueId}" content-type="application/json" content-disposition="inline" acl="PublicRead">
+		<s3 bucket="wf-vr-training">
+			<s3-put path="temp.bucket/_r2d2/${uniqueId}" content-type="application/json" content-disposition="inline" acl="PublicRead">
 				<script return='file_content' />
 			</s3-put>
 		</s3>
