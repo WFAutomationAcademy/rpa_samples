@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+    <var-def name="api_responce">
+		<http-extended url="https://query.yahooapis.com/v1/public/yql" method="get">
+            <!-- Yahoo use woeid for identifying place, you can find a list of woeids here: https://codebeautify.org/jsonviewer/f83352 -->
+		    <http-param-extended name="q"><template>select * from weather.forecast where woeid=834463 and u='c'</template></http-param-extended>
+		    <http-param-extended name="format"><template>json</template></http-param-extended>
+		</http-extended>
+    </var-def>
+    
+    <script><![CDATA[
+        import groovy.json.JsonSlurper 
+                      
+        jsonSlurper = new JsonSlurper()
+        api_responce = jsonSlurper.parseText(api_responce.toString())
+        if (api_responce != null && api_responce.query.results != null) {
+		    process_responce(api_responce)
+		} else {
+		    error = "Service's provided null responce. Please check service avalability and your request."
+		    sys.defineVariable("error", error)
+		    log.error(error)
+		}
+		
+		private void process_responce(api_responce) {
+		    weather = api_responce.query.results.channel.item
+		    temperature = weather.condition.temp
+		    sys.defineVariable("temperature", temperature)
+		    forecast = weather.forecast
+		    quantity_of_days = forecast.text.findAll { it.contains('Cloudy') }.size()
+		    sys.defineVariable("quantity_of_days", quantity_of_days)
+		    next_rainy_day = forecast.find { it.text.contains('Rain') }
+		    next_rainy_day = next_rainy_day.date
+		    sys.defineVariable("next_rainy_day", next_rainy_day)
+		}
+    ]]></script>  
+
+    <export include-original-data="false">
+        <case>
+	        <if condition="${!sys.isVariableDefined('error')}">
+		        <single-column name="Temperature" value="${temperature}"/> 
+		        <single-column name="Quantity of cloudy days" value="${quantity_of_days}"/> 
+		        <single-column name="Next rainy day" value="${next_rainy_day}"/>
+	        </if>
+	        <else>
+	            <single-column name="Error description" value="${error}"/>
+	        </else>
+        </case>  
+    </export>
+</config>

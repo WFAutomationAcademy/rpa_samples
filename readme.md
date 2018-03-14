@@ -64,6 +64,9 @@ Directory | Description | Business process(BP) analogue |
     for first assignment, you should use [MS API](https://www.microsoft.com/en-us/translator/translatorapi.aspx) there.
 * [configs/webharvest/validate-url.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/validate-url.xml) -
     Checking site status with [```<url-validator>```](https://kb.workfusion.com/display/WF/url-validator).
+* [configs/webharvest/weather-yahoo.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/webharvest/weather-yahoo.xml) -
+    Accessing REST API, [provided by Yahoo](https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid=834463%20and%20u=%27c%27&format=json),
+        and parcing JSON responce. The sample's description is also available on [kb](https://kb.workfusion.com/display/RPA/Accessing+REST+API+and+parcing+JSON+responce) also.
 
 ## [configs/rpa](https://github.com/WFAutomationAcademy/RPA-Samples/tree/master/configs/rpa) - Samples of RPA automation.
 
