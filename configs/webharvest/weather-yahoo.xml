@@ -4,7 +4,7 @@
     <var-def name="api_responce">
 		<http-extended url="https://query.yahooapis.com/v1/public/yql" method="get">
             <!-- Yahoo use woeid for identifying place, you can find a list of woeids here: https://codebeautify.org/jsonviewer/f83352 -->
-		    <http-param-extended name="q"><template>select * from weather.forecast where woeid=834463 and u='c'</template></http-param-extended>
+		    <http-param-extended name="q"><template>select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="minsk, by") and u='c'</template></http-param-extended>
 		    <http-param-extended name="format"><template>json</template></http-param-extended>
 		</http-extended>
     </var-def>
@@ -30,7 +30,8 @@
 		    quantity_of_days = forecast.text.findAll { it.contains('Cloudy') }.size()
 		    sys.defineVariable("quantity_of_days", quantity_of_days)
 		    next_rainy_day = forecast.find { it.text.contains('Rain') }
-		    next_rainy_day = next_rainy_day.date
+		    // if there isn't any rain soon export 'far away'
+		    next_rainy_day = null == next_rainy_day ? 'far away' : next_rainy_day.date
 		    sys.defineVariable("next_rainy_day", next_rainy_day)
 		}
     ]]></script>  
