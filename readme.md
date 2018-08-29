@@ -190,4 +190,6 @@ Directory | Description | Business process(BP) analogue |
 * [configs/rpa/webharvest/page-source.xml](https://github.com/WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/webharvest/page-source.xml) -
     Scrapping web-table content. You can find simplified version in
     [configs/rpa/simplified/table-scraping-webharvest.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/table-scraping-webharvest.xml).
+* [configs/rpa/webharvest/logInfoAndScreenshot.xml](https://github.com/WFAutomationAcademy/rpa_samples/blob/master/configs/rpa/webharvest/logInfoAndScreenshot.xml) - 
+    Error and debugging practices.
 
