@@ -1,6 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
-
-    <export include-original-data="true"></export>
-
+	
+	<var-def name="variable_from_xml">1.2</var-def>
+	
+	<script><![CDATA[
+		//get variable from XML to Groovy
+		println variable_from_xml
+		println variable_from_xml.getClass()
+		println variable_from_xml.getWrappedObject().getClass()
+		println variable_from_xml.get(0).getWrappedObject().getClass()
+		
+		println "\nStatic variable"
+		//Static variable -- Use a static variable if you are sure which variable will be stored internally.
+		String s1 = "a" // it is byte massive. String size equals 2 byte * string size
+		char s2 = 'a' // 2 byte
+		int s3 = 1 // 4 byte
+		float s4 = 1.1 // 4 byte
+		double s5 = 1.1 // 8 byte
+		BigDecimal s6 = 1.1 // 8 byte This type of variable is more accurate, but less slow then Double.
+		boolean s7 = true // 1 bit
+		
+		println s1.getClass()
+		println s2.getClass()
+		println s3.getClass()
+		println s4.getClass()
+		println s5.getClass()
+		println s6.getClass()
+		println s7.getClass()	
+		
+		println "\nDynamic variable"
+		//dinamic variable -- Use a dynamic variable if you are not sure which variable will be stored internally.
+		def d1 = "a"
+		def d2 = 'a'
+		def d3 = 'a' as Character
+		def d4 = 1
+		def d5 = 1.1
+		def d6 = 1.1 as Double
+		def d7 = true
+		
+		println d1.getClass()
+		println d2.getClass()
+		println d3.getClass()
+		println d4.getClass()
+		println d5.getClass()
+		println d6.getClass()
+		println d7.getClass()
+		
+		println "\nScript variable"
+		//script variable(dynamic variable) -- you must initialize this variable when creating.
+		v1 = "a"
+		v2 = 'a'
+		v3 = 'a' as Character
+		v4 = 1
+		v5 = 1.1
+		v6 = 1.1 as Double
+		v7 = true
+		
+		println v1.getClass()
+		println v2.getClass()
+		println v3.getClass()
+		println v4.getClass()
+		println v5.getClass()
+		println v6.getClass()
+		println v7.getClass()
+		
+		//Moving a variable from groovy to XML
+		sys.defineVariable("variable_from_groovy", v5)
+	]]></script>
+	
+	<var-def name="text">
+		<var name="variable_from_groovy"/> <!--call variable-->
+		<script return="variable_from_groovy"/> <!--construct to get a variable from the script-->
+	</var-def>
+	
+	<script><![CDATA[ 
+		println text
+	]]></script>
+	
+	<export include-original-data="false"></export>
 </config>
