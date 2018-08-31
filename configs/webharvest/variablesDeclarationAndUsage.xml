@@ -79,3 +79,39 @@
 	
 	<export include-original-data="false"></export>
 </config>
+
+<!--Console result:
+1.1
+class org.webharvest.runtime.variables.ListVariable
+class java.util.ArrayList
+class java.lang.String
+
+Static variable
+class java.lang.String
+class java.lang.Character
+class java.lang.Integer
+class java.lang.Float
+class java.lang.Double
+class java.math.BigDecimal
+class java.lang.Boolean
+
+Dynamic variable
+class java.lang.String
+class java.lang.String
+class java.lang.Character
+class java.lang.Integer
+class java.math.BigDecimal
+class java.lang.Double
+class java.lang.Boolean
+
+Script variable
+class java.lang.String
+class java.lang.String
+class java.lang.Character
+class java.lang.Integer
+class java.math.BigDecimal
+class java.lang.Double
+class java.lang.Boolean
+1.1
+1.1
+-->
