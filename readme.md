@@ -112,10 +112,10 @@ Directory | Description | Business process(BP) analogue |
 	Pinging domains and exporting results.
 * [configs/rpa/simplified/drag-and-drop.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/drag-and-drop.xml) -
 	Automated drag-and-dropping on web-page.
-* [configs/rpa/simplified/excel-2.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/excel-2.xml) -
-	Copying from one excel file to another.
 * [configs/rpa/simplified/excel.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/excel.xml) -
 	Getting data from excel file and exporting it.
+* [configs/rpa/simplified/excel-2.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/excel-2.xml) -
+	Copying from one excel file to another.
 * [configs/rpa/simplified/file-upload-universal.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/file-upload-universal.xml) -
 	Attaching file to email with [`universal`](https://kb.workfusion.com/display/RPA/Universal+RPA+Driver) driver..
 * [configs/rpa/simplified/file-upload.xml](https://github.com//WFAutomationAcademy/RPA-Samples/blob/master/configs/rpa/simplified/file-upload.xml) -
